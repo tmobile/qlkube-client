@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { QlkubeContext } from '../context/QlkubeProvider';
-import { subscribe } from '../../core/qlkubeRequests';
+import { request, subscribe } from '../../core/qlkubeRequests';
 import { ServerStatus } from '../../enum/qlkube.enum';
 
 const useSub = () => {
@@ -44,7 +44,8 @@ const useMonoSub = () => {
       clusterUrl,
       requestString,
       requestVariables,
-      serverStatusCallback
+      serverStatusCallback,
+      errorCallback
     ) => {
       return new Promise((resolve, reject) => {
 
@@ -72,6 +73,10 @@ const useMonoSub = () => {
           const eventData= jsonData?.data;
           const statusData= jsonData?.status;
           if(eventData){
+            if(eventData.error&&errorCallback){
+              const errorReason = eventData.error?.errorPayload?.reason;
+              errorCallback('qlkube error', errorReason || 'error fetching gql data');
+            }
             resolve({
               data: eventData
             });
