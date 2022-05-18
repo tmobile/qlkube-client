@@ -7,8 +7,6 @@
 
 # testing
 /coverage
-auth.json
-state.json
 
 # production
 /build
@@ -23,6 +21,3 @@ state.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-.env
-.vscode

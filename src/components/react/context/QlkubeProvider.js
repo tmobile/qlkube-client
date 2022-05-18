@@ -55,4 +55,4 @@ const QlkubeProvider = ({ children, wsUrl, queryUrl, doKeepAlive }) => {
   );
 };
 
-export default QlkubeProvider;
+export { QlkubeProvider };
