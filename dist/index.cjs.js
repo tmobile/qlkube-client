@@ -426,8 +426,53 @@ var useMonoSub = function useMonoSub() {
     socketStatus: socketStatus
   };
 }; // ## Webpack 5 issues
+// const useQuery = () => {
+//   const QLKUBE_PROVIDER = useContext(QlkubeContext);
+//   const { qlkubeUrl } = QLKUBE_PROVIDER;
+//   return async (
+//     authToken,
+//     clusterUrl,
+//     requestString,
+//     requestVariables,
+//     serverStatusCallback
+//   ) => {
+//     const requestParameters= JSON.stringify({
+//       authorization: `Bearer ${authToken}`,
+//       clusterUrl,
+//       query: requestString,
+//       queryVariables: requestVariables
+//     });
+//     const res = await request(
+//       requestParameters,
+//       qlkubeUrl,
+//       serverStatusCallback
+//     );
+//     return res
+//   }
+// }
+
+
+var useLink = function useLink() {
+  var QLKUBE_PROVIDER = react.useContext(QlkubeContext);
+  var socketState = QLKUBE_PROVIDER.socketState,
+      ws = QLKUBE_PROVIDER.ws;
+
+  var _useState7 = react.useState(null),
+      _useState8 = _slicedToArray(_useState7, 2),
+      connectStatus = _useState8[0],
+      setConnectStatu = _useState8[1];
+
+  react.useEffect(function () {
+    setConnectStatu(socketState);
+  }, [socketState]);
+  return {
+    socketState: connectStatus,
+    ws: ws
+  };
+};
 
 exports.QlkubeProvider = QlkubeProvider;
 exports.subscribe = subscribe;
+exports.useLink = useLink;
 exports.useMonoSub = useMonoSub;
 exports.useSub = useSub;
