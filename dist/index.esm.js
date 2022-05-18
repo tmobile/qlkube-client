@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
+import { jsx } from 'react/jsx-runtime';
 
 var ServerStatus = {
   exists: 'exists',
@@ -308,7 +309,7 @@ var QlkubeProvider = function QlkubeProvider(_ref) {
     };
   }();
 
-  return /*#__PURE__*/React.createElement(QlkubeContext.Provider, {
+  return /*#__PURE__*/jsx(QlkubeContext.Provider, {
     value: {
       ws: ws,
       socketState: socketState,
@@ -317,8 +318,9 @@ var QlkubeProvider = function QlkubeProvider(_ref) {
       qlkubeUrl_ws: wsUrl,
       reconnect: reconnect,
       updateQlkubeSocketStatus: updateQlkubeSocketStatus
-    }
-  }, children);
+    },
+    children: children
+  });
 };
 
 var useSub = function useSub() {
