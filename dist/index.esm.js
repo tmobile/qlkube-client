@@ -1,5 +1,112 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 
+var ServerStatus = {
+  exists: 'exists',
+  generating: 'generating',
+  complete: 'complete'
+};
+
+// const urlParse = require('url');
+// const https = require('http');
+
+var clientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
+
+function SubscriptionHandle(queryString, subscriptionId, unsubscribe) {
+  this.queryString = queryString;
+  this.subscriptionId = subscriptionId;
+  this.unsubscribe = unsubscribe;
+}
+
+var subscribe = function subscribe(queryString, clusterUrl, token, ws, isMono, connectionParams) {
+  var messageServer = function messageServer(msg) {
+    ws === null || ws === void 0 ? void 0 : ws.send(msg);
+  };
+
+  var subscriptionId = "subscription-".concat(Date.now().toString(36) + Math.random().toString(36).substring(1, 10));
+
+  if (isMono) {
+    var monoClientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
+    messageServer(JSON.stringify({
+      requestType: 'subscribe_mono',
+      clientId: monoClientId,
+      connectionParams: connectionParams
+    }));
+    return new SubscriptionHandle(queryString, subscriptionId, function () {
+      return messageServer(JSON.stringify({
+        requestType: 'close',
+        connectionParams: {
+          clusterUrl: clusterUrl,
+          clientId: monoClientId,
+          clientSubId: "".concat(subscriptionId)
+        }
+      }));
+    });
+  } else {
+    messageServer(JSON.stringify({
+      requestType: 'subscribe',
+      clientId: clientId,
+      query: queryString,
+      connectionParams: {
+        authorization: "Bearer ".concat(token),
+        clusterUrl: clusterUrl,
+        clientId: clientId,
+        clientSubId: subscriptionId
+      }
+    }));
+    return new SubscriptionHandle(queryString, subscriptionId, function () {
+      return messageServer(JSON.stringify({
+        requestType: 'close',
+        connectionParams: {
+          clusterUrl: clusterUrl,
+          clientId: clientId,
+          clientSubId: "".concat(subscriptionId)
+        }
+      }));
+    });
+  }
+}; // ## Issues with web pack 5 
+// export const request = async (
+//   connectionParams,
+//   qlkubeUrl,
+//   serverStatusCallback
+// ) => {
+//   try {
+//     const opts = urlParse.parse(qlkubeUrl)
+//     opts.headers = {};
+//     opts.headers['Content-Type'] = 'application/json';
+//     opts.headers['connectionParams'] = connectionParams;
+//     opts['timeout'] = 500000;
+//     const httpRequestPromise= new Promise((resolve, reject) => {
+//       https.request(opts, function (res) {
+//         let chunks = []
+//         res.setEncoding('utf8');
+//         res.on('data', async function (body) {
+//           const validJson= await isJsonString(body);
+//           if(validJson){
+//             const result= processData(validJson, serverStatusCallback, res);
+//             if(!result.suspendResolve){
+//               resolve(result)
+//             }else{}
+//           }else{
+//             chunks.push(new Buffer.from(body))
+//           }
+//         });
+//         res.on('error', (err) => {throw new Error(err)});
+//         res.on('close', (msg) => {});
+//         res.on('end', function () {
+//           if(chunks?.length>0){
+//             const data = Buffer.concat(chunks);
+//             const parsedChunks = JSON.parse(data);
+//             const result= processData(parsedChunks, serverStatusCallback, null);
+//             resolve(result)
+//           }
+//         })
+//       }).end(() => {});
+//     })
+//     return httpRequestPromise;
+//   } catch (error) {}
+// };
+
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
     var info = gen[key](arg);
@@ -94,184 +201,6 @@ function _arrayLikeToArray(arr, len) {
 function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
-
-var ServerStatus = {
-  exists: 'exists',
-  generating: 'generating',
-  complete: 'complete'
-};
-
-var urlParse = require('url');
-
-var https = require('http');
-
-var clientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
-
-function SubscriptionHandle(queryString, subscriptionId, unsubscribe) {
-  this.queryString = queryString;
-  this.subscriptionId = subscriptionId;
-  this.unsubscribe = unsubscribe;
-}
-
-var isJsonString = function isJsonString(str) {
-  try {
-    return JSON.parse(str);
-  } catch (e) {
-    return false;
-  }
-};
-
-var processData = function processData(finalData, serverStatusCallback, res) {
-  var response = finalData;
-  if (!response && (res === null || res === void 0 ? void 0 : res.statusCode) === 200) return;
-  var data = response.data,
-      status = response.status;
-
-  if (!data && status === ServerStatus.generating) {
-    serverStatusCallback && serverStatusCallback(ServerStatus.generating);
-    return {
-      suspendResolve: true,
-      status: ServerStatus.generating
-    };
-  } else if (data && (status === ServerStatus.exists || status === ServerStatus.complete)) {
-    serverStatusCallback && serverStatusCallback(ServerStatus.exists);
-    return data;
-  }
-};
-
-var subscribe = function subscribe(queryString, clusterUrl, token, ws, isMono, connectionParams) {
-  var messageServer = function messageServer(msg) {
-    ws === null || ws === void 0 ? void 0 : ws.send(msg);
-  };
-
-  var subscriptionId = "subscription-".concat(Date.now().toString(36) + Math.random().toString(36).substring(1, 10));
-
-  if (isMono) {
-    var monoClientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
-    messageServer(JSON.stringify({
-      requestType: 'subscribe_mono',
-      clientId: monoClientId,
-      connectionParams: connectionParams
-    }));
-    return new SubscriptionHandle(queryString, subscriptionId, function () {
-      return messageServer(JSON.stringify({
-        requestType: 'close',
-        connectionParams: {
-          clusterUrl: clusterUrl,
-          clientId: monoClientId,
-          clientSubId: "".concat(subscriptionId)
-        }
-      }));
-    });
-  } else {
-    messageServer(JSON.stringify({
-      requestType: 'subscribe',
-      clientId: clientId,
-      query: queryString,
-      connectionParams: {
-        authorization: "Bearer ".concat(token),
-        clusterUrl: clusterUrl,
-        clientId: clientId,
-        clientSubId: subscriptionId
-      }
-    }));
-    return new SubscriptionHandle(queryString, subscriptionId, function () {
-      return messageServer(JSON.stringify({
-        requestType: 'close',
-        connectionParams: {
-          clusterUrl: clusterUrl,
-          clientId: clientId,
-          clientSubId: "".concat(subscriptionId)
-        }
-      }));
-    });
-  }
-}; // ## Issues with web pack 5 
-
-var request = /*#__PURE__*/function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(connectionParams, qlkubeUrl, serverStatusCallback) {
-    var opts, httpRequestPromise;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            _context2.prev = 0;
-            opts = urlParse.parse(qlkubeUrl);
-            opts.headers = {};
-            opts.headers['Content-Type'] = 'application/json';
-            opts.headers['connectionParams'] = connectionParams;
-            opts['timeout'] = 500000;
-            httpRequestPromise = new Promise(function (resolve, reject) {
-              https.request(opts, function (res) {
-                var chunks = [];
-                res.setEncoding('utf8');
-                res.on('data', /*#__PURE__*/function () {
-                  var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(body) {
-                    var validJson, result;
-                    return regeneratorRuntime.wrap(function _callee$(_context) {
-                      while (1) {
-                        switch (_context.prev = _context.next) {
-                          case 0:
-                            _context.next = 2;
-                            return isJsonString(body);
-
-                          case 2:
-                            validJson = _context.sent;
-
-                            if (validJson) {
-                              result = processData(validJson, serverStatusCallback, res);
-
-                              if (!result.suspendResolve) {
-                                resolve(result);
-                              }
-                            } else {
-                              chunks.push(new Buffer.from(body));
-                            }
-
-                          case 4:
-                          case "end":
-                            return _context.stop();
-                        }
-                      }
-                    }, _callee);
-                  }));
-
-                  return function (_x4) {
-                    return _ref2.apply(this, arguments);
-                  };
-                }());
-                res.on('error', function (err) {
-                  throw new Error(err);
-                });
-                res.on('close', function (msg) {});
-                res.on('end', function () {
-                  if ((chunks === null || chunks === void 0 ? void 0 : chunks.length) > 0) {
-                    var data = Buffer.concat(chunks);
-                    var parsedChunks = JSON.parse(data);
-                    var result = processData(parsedChunks, serverStatusCallback, null);
-                    resolve(result);
-                  }
-                });
-              }).end(function () {});
-            });
-            return _context2.abrupt("return", httpRequestPromise);
-
-          case 10:
-            _context2.prev = 10;
-            _context2.t0 = _context2["catch"](0);
-
-          case 12:
-          case "end":
-            return _context2.stop();
-        }
-      }
-    }, _callee2, null, [[0, 10]]);
-  }));
-
-  return function request(_x, _x2, _x3) {
-    return _ref.apply(this, arguments);
-  };
-}();
 
 var QlkubeContext = /*#__PURE__*/createContext();
 
@@ -494,42 +423,4 @@ var useMonoSub = function useMonoSub() {
   };
 }; // ## Webpack 5 issues
 
-
-var useQuery = function useQuery() {
-  var QLKUBE_PROVIDER = useContext(QlkubeContext);
-  var qlkubeUrl = QLKUBE_PROVIDER.qlkubeUrl;
-  return /*#__PURE__*/function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(authToken, clusterUrl, requestString, requestVariables, serverStatusCallback) {
-      var requestParameters, res;
-      return regeneratorRuntime.wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              requestParameters = JSON.stringify({
-                authorization: "Bearer ".concat(authToken),
-                clusterUrl: clusterUrl,
-                query: requestString,
-                queryVariables: requestVariables
-              });
-              _context.next = 3;
-              return request(requestParameters, qlkubeUrl, serverStatusCallback);
-
-            case 3:
-              res = _context.sent;
-              return _context.abrupt("return", res);
-
-            case 5:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, _callee);
-    }));
-
-    return function (_x, _x2, _x3, _x4, _x5) {
-      return _ref.apply(this, arguments);
-    };
-  }();
-};
-
-export { QlkubeProvider, request, subscribe, useMonoSub, useQuery, useSub };
+export { QlkubeProvider, subscribe, useMonoSub, useSub };

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { QlkubeContext } from '../context/QlkubeProvider';
-import { request, subscribe } from '../../core/qlkubeRequests';
+import { subscribe } from '../../core/qlkubeRequests';
 import { ServerStatus } from '../../enum/qlkube.enum';
 
 const useSub = () => {
