@@ -471,6 +471,7 @@ var useLink = function useLink() {
   };
 };
 
+exports.QlkubeContext = QlkubeContext;
 exports.QlkubeProvider = QlkubeProvider;
 exports.subscribe = subscribe;
 exports.useLink = useLink;
