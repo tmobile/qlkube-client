@@ -6,7 +6,6 @@ const QlkubeProvider = ({ children, wsUrl, queryUrl, doKeepAlive }) => {
   const [socketState, setSocketState] = useState(null);
   const [qlkubeSocketStatus, setQlkubeSocketStatus]= useState(null);
 
-  const addSocketToReconnect = (newNsMap) => {};
   const reconnect = async() => {
     if(ws){
       await ws?.close()
@@ -15,9 +14,25 @@ const QlkubeProvider = ({ children, wsUrl, queryUrl, doKeepAlive }) => {
   const updateQlkubeSocketStatus = (stat) => {
     setQlkubeSocketStatus(stat)
   }
+
   useEffect(() => {
     connectWs();
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    let pingIntervalRef;
+    if(doKeepAlive&&ws&&socketState){
+      pingIntervalRef = serverPingPong();
+    }
+    return () => pingIntervalRef&&clearInterval(pingIntervalRef)
+  }, [ws, socketState]);
+
+  const serverPingPong = () => {
+    return setInterval(() => {
+      console.log('ping')
+      ws&&socketState&&ws.send('ping');
+    }, 5000)
+  }
 
   const connectWs = async() => {
     if(ws){
