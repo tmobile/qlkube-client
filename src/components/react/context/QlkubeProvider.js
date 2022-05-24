@@ -1,7 +1,7 @@
 import { useState, createContext, useEffect } from 'react';
 export const QlkubeContext = createContext();
 
-const QlkubeProvider = ({ children, wsUrl, queryUrl, doKeepAlive }) => {
+const QlkubeProvider = ({ children, wsUrl, queryUrl, doKeepAlive, pingTimeout=20000 }) => {
   const [ws, setWs] = useState(null);
   const [socketState, setSocketState] = useState(null);
   const [qlkubeSocketStatus, setQlkubeSocketStatus]= useState(null);
@@ -31,7 +31,7 @@ const QlkubeProvider = ({ children, wsUrl, queryUrl, doKeepAlive }) => {
     return setInterval(() => {
       console.log('ping')
       ws&&socketState&&ws.send('ping');
-    }, 5000)
+    }, pingTimeout)
   }
 
   const connectWs = async() => {

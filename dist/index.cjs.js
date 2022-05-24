@@ -213,7 +213,9 @@ var QlkubeProvider = function QlkubeProvider(_ref) {
   var children = _ref.children,
       wsUrl = _ref.wsUrl,
       queryUrl = _ref.queryUrl,
-      doKeepAlive = _ref.doKeepAlive;
+      doKeepAlive = _ref.doKeepAlive,
+      _ref$pingTimeout = _ref.pingTimeout,
+      pingTimeout = _ref$pingTimeout === void 0 ? 20000 : _ref$pingTimeout;
 
   var _useState = react.useState(null),
       _useState2 = _slicedToArray(_useState, 2),
@@ -280,7 +282,7 @@ var QlkubeProvider = function QlkubeProvider(_ref) {
     return setInterval(function () {
       console.log('ping');
       ws && socketState && ws.send('ping');
-    }, 5000);
+    }, pingTimeout);
   };
 
   var connectWs = /*#__PURE__*/function () {
