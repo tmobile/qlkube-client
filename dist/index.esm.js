@@ -276,7 +276,6 @@ var QlkubeProvider = function QlkubeProvider(_ref) {
 
   var serverPingPong = function serverPingPong() {
     return setInterval(function () {
-      console.log('ping');
       ws && socketState && ws.send('ping');
     }, pingTimeout);
   };

@@ -29,7 +29,6 @@ const QlkubeProvider = ({ children, wsUrl, queryUrl, doKeepAlive, pingTimeout=20
 
   const serverPingPong = () => {
     return setInterval(() => {
-      console.log('ping')
       ws&&socketState&&ws.send('ping');
     }, pingTimeout)
   }
