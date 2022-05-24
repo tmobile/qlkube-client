@@ -208,8 +208,8 @@ var QlkubeContext = /*#__PURE__*/createContext();
 var QlkubeProvider = function QlkubeProvider(_ref) {
   var children = _ref.children,
       wsUrl = _ref.wsUrl,
-      queryUrl = _ref.queryUrl;
-      _ref.doKeepAlive;
+      queryUrl = _ref.queryUrl,
+      doKeepAlive = _ref.doKeepAlive;
 
   var _useState = useState(null),
       _useState2 = _slicedToArray(_useState, 2),
@@ -260,6 +260,24 @@ var QlkubeProvider = function QlkubeProvider(_ref) {
   useEffect(function () {
     connectWs();
   }, []);
+  useEffect(function () {
+    var pingIntervalRef;
+
+    if (doKeepAlive && ws && socketState) {
+      pingIntervalRef = serverPingPong();
+    }
+
+    return function () {
+      return pingIntervalRef && clearInterval(pingIntervalRef);
+    };
+  }, [ws, socketState]);
+
+  var serverPingPong = function serverPingPong() {
+    return setInterval(function () {
+      console.log('ping');
+      ws && socketState && ws.send('ping');
+    }, 5000);
+  };
 
   var connectWs = /*#__PURE__*/function () {
     var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
