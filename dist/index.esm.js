@@ -447,9 +447,9 @@ var ServerStatus = {
   complete: 'complete'
 };
 
-require('url');
+var urlParse = require('url');
 
-require('http');
+var https = require('http');
 
 var clientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
 
@@ -458,6 +458,32 @@ function SubscriptionHandle(queryString, subscriptionId, unsubscribe) {
   this.subscriptionId = subscriptionId;
   this.unsubscribe = unsubscribe;
 }
+
+var isJsonString = function isJsonString(str) {
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+};
+
+var processData = function processData(finalData, serverStatusCallback, res) {
+  var response = finalData;
+  if (!response && (res === null || res === void 0 ? void 0 : res.statusCode) === 200) return;
+  var data = response.data,
+      status = response.status;
+
+  if (!data && status === ServerStatus.generating) {
+    serverStatusCallback && serverStatusCallback(ServerStatus.generating);
+    return {
+      suspendResolve: true,
+      status: ServerStatus.generating
+    };
+  } else if (data && (status === ServerStatus.exists || status === ServerStatus.complete)) {
+    serverStatusCallback && serverStatusCallback(ServerStatus.exists);
+    return data;
+  }
+};
 
 var subscribe = function subscribe(queryString, clusterUrl, token, ws, isMono, connectionParams) {
   var messageServer = function messageServer(msg) {
@@ -506,7 +532,92 @@ var subscribe = function subscribe(queryString, clusterUrl, token, ws, isMono, c
       }));
     });
   }
-}; // ## Issues with web pack 5
+}; // ## Issues with web pack 5 
+
+var request = /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(connectionParams, qlkubeUrl, serverStatusCallback) {
+    var opts, httpRequestPromise;
+    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.prev = 0;
+            opts = urlParse.parse(qlkubeUrl);
+            opts.headers = {};
+            opts.headers['Content-Type'] = 'application/json';
+            opts.headers['connectionParams'] = connectionParams;
+            opts['timeout'] = 500000;
+            httpRequestPromise = new Promise(function (resolve, reject) {
+              https.request(opts, function (res) {
+                var chunks = [];
+                res.setEncoding('utf8');
+                res.on('data', /*#__PURE__*/function () {
+                  var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(body) {
+                    var validJson, result;
+                    return _regeneratorRuntime().wrap(function _callee$(_context) {
+                      while (1) {
+                        switch (_context.prev = _context.next) {
+                          case 0:
+                            _context.next = 2;
+                            return isJsonString(body);
+
+                          case 2:
+                            validJson = _context.sent;
+
+                            if (validJson) {
+                              result = processData(validJson, serverStatusCallback, res);
+
+                              if (!result.suspendResolve) {
+                                resolve(result);
+                              }
+                            } else {
+                              chunks.push(new Buffer.from(body));
+                            }
+
+                          case 4:
+                          case "end":
+                            return _context.stop();
+                        }
+                      }
+                    }, _callee);
+                  }));
+
+                  return function (_x4) {
+                    return _ref2.apply(this, arguments);
+                  };
+                }());
+                res.on('error', function (err) {
+                  throw new Error(err);
+                });
+                res.on('close', function (msg) {});
+                res.on('end', function () {
+                  if ((chunks === null || chunks === void 0 ? void 0 : chunks.length) > 0) {
+                    var data = Buffer.concat(chunks);
+                    var parsedChunks = JSON.parse(data);
+                    var result = processData(parsedChunks, serverStatusCallback, null);
+                    resolve(result);
+                  }
+                });
+              }).end(function () {});
+            });
+            return _context2.abrupt("return", httpRequestPromise);
+
+          case 10:
+            _context2.prev = 10;
+            _context2.t0 = _context2["catch"](0);
+
+          case 12:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2, null, [[0, 10]]);
+  }));
+
+  return function request(_x, _x2, _x3) {
+    return _ref.apply(this, arguments);
+  };
+}();
 
 var QlkubeContext = /*#__PURE__*/createContext();
 
@@ -768,4 +879,4 @@ var useLink = function useLink() {
   };
 };
 
-export { QlkubeContext, QlkubeProvider, subscribe, useLink, useMonoSub, useSub };
+export { QlkubeContext, QlkubeProvider, request, subscribe, useLink, useMonoSub, useSub };
