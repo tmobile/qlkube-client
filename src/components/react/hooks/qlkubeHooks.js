@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { QlkubeContext } from '../context/QlkubeProvider';
-import { subscribe } from '../../core/qlkubeRequests';
+import { subscribe, request } from '../../core/qlkubeRequests';
 import { ServerStatus } from '../../enum/qlkube.enum';
 
 const useSub = () => {
@@ -94,30 +94,30 @@ const useMonoSub = () => {
 }
 
 // ## Webpack 5 issues
-// const useQuery = () => {
-//   const QLKUBE_PROVIDER = useContext(QlkubeContext);
-//   const { qlkubeUrl } = QLKUBE_PROVIDER;
-//   return async (
-//     authToken,
-//     clusterUrl,
-//     requestString,
-//     requestVariables,
-//     serverStatusCallback
-//   ) => {
-//     const requestParameters= JSON.stringify({
-//       authorization: `Bearer ${authToken}`,
-//       clusterUrl,
-//       query: requestString,
-//       queryVariables: requestVariables
-//     });
-//     const res = await request(
-//       requestParameters,
-//       qlkubeUrl,
-//       serverStatusCallback
-//     );
-//     return res
-//   }
-// }
+const useQuery = () => {
+  const QLKUBE_PROVIDER = useContext(QlkubeContext);
+  const { qlkubeUrl } = QLKUBE_PROVIDER;
+  return async (
+    authToken,
+    clusterUrl,
+    requestString,
+    requestVariables,
+    serverStatusCallback
+  ) => {
+    const requestParameters= JSON.stringify({
+      authorization: `Bearer ${authToken}`,
+      clusterUrl,
+      query: requestString,
+      queryVariables: requestVariables
+    });
+    const res = await request(
+      requestParameters,
+      qlkubeUrl,
+      serverStatusCallback
+    );
+    return res
+  }
+}
 
 const useLink = () => {
   const QLKUBE_PROVIDER = useContext(QlkubeContext);
@@ -136,7 +136,7 @@ const useLink = () => {
 }
 
 export {
-  // useQuery,
+  useQuery,
   useSub,
   useMonoSub,
   useLink

@@ -1,113 +1,6 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import { jsx } from 'react/jsx-runtime';
 
-var ServerStatus = {
-  exists: 'exists',
-  generating: 'generating',
-  complete: 'complete'
-};
-
-// const urlParse = require('url');
-// const https = require('http');
-
-var clientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
-
-function SubscriptionHandle(queryString, subscriptionId, unsubscribe) {
-  this.queryString = queryString;
-  this.subscriptionId = subscriptionId;
-  this.unsubscribe = unsubscribe;
-}
-
-var subscribe = function subscribe(queryString, clusterUrl, token, ws, isMono, connectionParams) {
-  var messageServer = function messageServer(msg) {
-    ws === null || ws === void 0 ? void 0 : ws.send(msg);
-  };
-
-  var subscriptionId = "subscription-".concat(Date.now().toString(36) + Math.random().toString(36).substring(1, 10));
-
-  if (isMono) {
-    var monoClientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
-    messageServer(JSON.stringify({
-      requestType: 'subscribe_mono',
-      clientId: monoClientId,
-      connectionParams: connectionParams
-    }));
-    return new SubscriptionHandle(queryString, subscriptionId, function () {
-      return messageServer(JSON.stringify({
-        requestType: 'close',
-        connectionParams: {
-          clusterUrl: clusterUrl,
-          clientId: monoClientId,
-          clientSubId: "".concat(subscriptionId)
-        }
-      }));
-    });
-  } else {
-    messageServer(JSON.stringify({
-      requestType: 'subscribe',
-      clientId: clientId,
-      query: queryString,
-      connectionParams: {
-        authorization: "Bearer ".concat(token),
-        clusterUrl: clusterUrl,
-        clientId: clientId,
-        clientSubId: subscriptionId
-      }
-    }));
-    return new SubscriptionHandle(queryString, subscriptionId, function () {
-      return messageServer(JSON.stringify({
-        requestType: 'close',
-        connectionParams: {
-          clusterUrl: clusterUrl,
-          clientId: clientId,
-          clientSubId: "".concat(subscriptionId)
-        }
-      }));
-    });
-  }
-}; // ## Issues with web pack 5 
-// export const request = async (
-//   connectionParams,
-//   qlkubeUrl,
-//   serverStatusCallback
-// ) => {
-//   try {
-//     const opts = urlParse.parse(qlkubeUrl)
-//     opts.headers = {};
-//     opts.headers['Content-Type'] = 'application/json';
-//     opts.headers['connectionParams'] = connectionParams;
-//     opts['timeout'] = 500000;
-//     const httpRequestPromise= new Promise((resolve, reject) => {
-//       https.request(opts, function (res) {
-//         let chunks = []
-//         res.setEncoding('utf8');
-//         res.on('data', async function (body) {
-//           const validJson= await isJsonString(body);
-//           if(validJson){
-//             const result= processData(validJson, serverStatusCallback, res);
-//             if(!result.suspendResolve){
-//               resolve(result)
-//             }else{}
-//           }else{
-//             chunks.push(new Buffer.from(body))
-//           }
-//         });
-//         res.on('error', (err) => {throw new Error(err)});
-//         res.on('close', (msg) => {});
-//         res.on('end', function () {
-//           if(chunks?.length>0){
-//             const data = Buffer.concat(chunks);
-//             const parsedChunks = JSON.parse(data);
-//             const result= processData(parsedChunks, serverStatusCallback, null);
-//             resolve(result)
-//           }
-//         })
-//       }).end(() => {});
-//     })
-//     return httpRequestPromise;
-//   } catch (error) {}
-// };
-
 function _regeneratorRuntime() {
   /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
 
@@ -548,6 +441,73 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
+var ServerStatus = {
+  exists: 'exists',
+  generating: 'generating',
+  complete: 'complete'
+};
+
+require('url');
+
+require('http');
+
+var clientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
+
+function SubscriptionHandle(queryString, subscriptionId, unsubscribe) {
+  this.queryString = queryString;
+  this.subscriptionId = subscriptionId;
+  this.unsubscribe = unsubscribe;
+}
+
+var subscribe = function subscribe(queryString, clusterUrl, token, ws, isMono, connectionParams) {
+  var messageServer = function messageServer(msg) {
+    ws === null || ws === void 0 ? void 0 : ws.send(msg);
+  };
+
+  var subscriptionId = "subscription-".concat(Date.now().toString(36) + Math.random().toString(36).substring(1, 10));
+
+  if (isMono) {
+    var monoClientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
+    messageServer(JSON.stringify({
+      requestType: 'subscribe_mono',
+      clientId: monoClientId,
+      connectionParams: connectionParams
+    }));
+    return new SubscriptionHandle(queryString, subscriptionId, function () {
+      return messageServer(JSON.stringify({
+        requestType: 'close',
+        connectionParams: {
+          clusterUrl: clusterUrl,
+          clientId: monoClientId,
+          clientSubId: "".concat(subscriptionId)
+        }
+      }));
+    });
+  } else {
+    messageServer(JSON.stringify({
+      requestType: 'subscribe',
+      clientId: clientId,
+      query: queryString,
+      connectionParams: {
+        authorization: "Bearer ".concat(token),
+        clusterUrl: clusterUrl,
+        clientId: clientId,
+        clientSubId: subscriptionId
+      }
+    }));
+    return new SubscriptionHandle(queryString, subscriptionId, function () {
+      return messageServer(JSON.stringify({
+        requestType: 'close',
+        connectionParams: {
+          clusterUrl: clusterUrl,
+          clientId: clientId,
+          clientSubId: "".concat(subscriptionId)
+        }
+      }));
+    });
+  }
+}; // ## Issues with web pack 5
+
 var QlkubeContext = /*#__PURE__*/createContext();
 
 var QlkubeProvider = function QlkubeProvider(_ref) {
@@ -788,31 +748,6 @@ var useMonoSub = function useMonoSub() {
     socketStatus: socketStatus
   };
 }; // ## Webpack 5 issues
-// const useQuery = () => {
-//   const QLKUBE_PROVIDER = useContext(QlkubeContext);
-//   const { qlkubeUrl } = QLKUBE_PROVIDER;
-//   return async (
-//     authToken,
-//     clusterUrl,
-//     requestString,
-//     requestVariables,
-//     serverStatusCallback
-//   ) => {
-//     const requestParameters= JSON.stringify({
-//       authorization: `Bearer ${authToken}`,
-//       clusterUrl,
-//       query: requestString,
-//       queryVariables: requestVariables
-//     });
-//     const res = await request(
-//       requestParameters,
-//       qlkubeUrl,
-//       serverStatusCallback
-//     );
-//     return res
-//   }
-// }
-
 
 var useLink = function useLink() {
   var QLKUBE_PROVIDER = useContext(QlkubeContext);

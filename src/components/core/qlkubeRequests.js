@@ -1,8 +1,8 @@
 import { ServerStatus } from '../enum/qlkube.enum';
 
 // ## Web pack 5 issues
-// const urlParse = require('url');
-// const https = require('http');
+const urlParse = require('url');
+const https = require('http');
 
 const clientId = `client-${Date.now().toString(36) + Math.random().toString(36).substr(2)}`;
 
@@ -96,44 +96,44 @@ export const subscribe = (queryString, clusterUrl, token, ws, isMono, connection
 
 
 // ## Issues with web pack 5 
-// export const request = async (
-//   connectionParams,
-//   qlkubeUrl,
-//   serverStatusCallback
-// ) => {
-//   try {
-//     const opts = urlParse.parse(qlkubeUrl)
-//     opts.headers = {};
-//     opts.headers['Content-Type'] = 'application/json';
-//     opts.headers['connectionParams'] = connectionParams;
-//     opts['timeout'] = 500000;
-//     const httpRequestPromise= new Promise((resolve, reject) => {
-//       https.request(opts, function (res) {
-//         let chunks = []
-//         res.setEncoding('utf8');
-//         res.on('data', async function (body) {
-//           const validJson= await isJsonString(body);
-//           if(validJson){
-//             const result= processData(validJson, serverStatusCallback, res);
-//             if(!result.suspendResolve){
-//               resolve(result)
-//             }else{}
-//           }else{
-//             chunks.push(new Buffer.from(body))
-//           }
-//         });
-//         res.on('error', (err) => {throw new Error(err)});
-//         res.on('close', (msg) => {});
-//         res.on('end', function () {
-//           if(chunks?.length>0){
-//             const data = Buffer.concat(chunks);
-//             const parsedChunks = JSON.parse(data);
-//             const result= processData(parsedChunks, serverStatusCallback, null);
-//             resolve(result)
-//           }
-//         })
-//       }).end(() => {});
-//     })
-//     return httpRequestPromise;
-//   } catch (error) {}
-// };
+export const request = async (
+  connectionParams,
+  qlkubeUrl,
+  serverStatusCallback
+) => {
+  try {
+    const opts = urlParse.parse(qlkubeUrl)
+    opts.headers = {};
+    opts.headers['Content-Type'] = 'application/json';
+    opts.headers['connectionParams'] = connectionParams;
+    opts['timeout'] = 500000;
+    const httpRequestPromise= new Promise((resolve, reject) => {
+      https.request(opts, function (res) {
+        let chunks = []
+        res.setEncoding('utf8');
+        res.on('data', async function (body) {
+          const validJson= await isJsonString(body);
+          if(validJson){
+            const result= processData(validJson, serverStatusCallback, res);
+            if(!result.suspendResolve){
+              resolve(result)
+            }else{}
+          }else{
+            chunks.push(new Buffer.from(body))
+          }
+        });
+        res.on('error', (err) => {throw new Error(err)});
+        res.on('close', (msg) => {});
+        res.on('end', function () {
+          if(chunks?.length>0){
+            const data = Buffer.concat(chunks);
+            const parsedChunks = JSON.parse(data);
+            const result= processData(parsedChunks, serverStatusCallback, null);
+            resolve(result)
+          }
+        })
+      }).end(() => {});
+    })
+    return httpRequestPromise;
+  } catch (error) {}
+};
