@@ -136,7 +136,7 @@ const useLink = () => {
 }
 
 export {
-  useQuery,
+  // useQuery,
   useSub,
   useMonoSub,
   useLink

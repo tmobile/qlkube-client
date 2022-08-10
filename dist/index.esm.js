@@ -447,9 +447,8 @@ var ServerStatus = {
   complete: 'complete'
 };
 
-var urlParse = require('url');
-
-var https = require('http');
+// const urlParse = require('url');
+// const https = require('http');
 
 var clientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
 
@@ -458,32 +457,6 @@ function SubscriptionHandle(queryString, subscriptionId, unsubscribe) {
   this.subscriptionId = subscriptionId;
   this.unsubscribe = unsubscribe;
 }
-
-var isJsonString = function isJsonString(str) {
-  try {
-    return JSON.parse(str);
-  } catch (e) {
-    return false;
-  }
-};
-
-var processData = function processData(finalData, serverStatusCallback, res) {
-  var response = finalData;
-  if (!response && (res === null || res === void 0 ? void 0 : res.statusCode) === 200) return;
-  var data = response.data,
-      status = response.status;
-
-  if (!data && status === ServerStatus.generating) {
-    serverStatusCallback && serverStatusCallback(ServerStatus.generating);
-    return {
-      suspendResolve: true,
-      status: ServerStatus.generating
-    };
-  } else if (data && (status === ServerStatus.exists || status === ServerStatus.complete)) {
-    serverStatusCallback && serverStatusCallback(ServerStatus.exists);
-    return data;
-  }
-};
 
 var subscribe = function subscribe(queryString, clusterUrl, token, ws, isMono, connectionParams) {
   var messageServer = function messageServer(msg) {
@@ -533,88 +506,84 @@ var subscribe = function subscribe(queryString, clusterUrl, token, ws, isMono, c
     });
   }
 }; // ## Issues with web pack 5 
+// export const request = async (
+//   connectionParams,
+//   qlkubeUrl,
+//   serverStatusCallback
+// ) => {
+//   try {
+//     const opts = urlParse.parse(qlkubeUrl)
+//     opts.headers = {};
+//     opts.headers['Content-Type'] = 'application/json';
+//     opts.headers['connectionParams'] = connectionParams;
+//     opts['timeout'] = 500000;
+//     const httpRequestPromise= new Promise((resolve, reject) => {
+//       https.request(opts, function (res) {
+//         let chunks = []
+//         res.setEncoding('utf8');
+//         res.on('data', async function (body) {
+//           const validJson= await isJsonString(body);
+//           if(validJson){
+//             const result= processData(validJson, serverStatusCallback, res);
+//             if(!result.suspendResolve){
+//               resolve(result)
+//             }else{}
+//           }else{
+//             chunks.push(new Buffer.from(body))
+//           }
+//         });
+//         res.on('error', (err) => {throw new Error(err)});
+//         res.on('close', (msg) => {});
+//         res.on('end', function () {
+//           if(chunks?.length>0){
+//             const data = Buffer.concat(chunks);
+//             const parsedChunks = JSON.parse(data);
+//             const result= processData(parsedChunks, serverStatusCallback, null);
+//             resolve(result)
+//           }
+//         })
+//       }).end(() => {});
+//     })
+//     return httpRequestPromise;
+//   } catch (error) {}
+// };
 
-var request = /*#__PURE__*/function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(connectionParams, qlkubeUrl, serverStatusCallback) {
-    var opts, httpRequestPromise;
-    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+var basic_request = /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(connectionParams, qlkubeUrl) {
+    var requestOptions, qlkRes, jsonRes;
+    return _regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context.prev = _context.next) {
           case 0:
-            _context2.prev = 0;
-            opts = urlParse.parse(qlkubeUrl);
-            opts.headers = {};
-            opts.headers['Content-Type'] = 'application/json';
-            opts.headers['connectionParams'] = connectionParams;
-            opts['timeout'] = 500000;
-            httpRequestPromise = new Promise(function (resolve, reject) {
-              https.request(opts, function (res) {
-                var chunks = [];
-                res.setEncoding('utf8');
-                res.on('data', /*#__PURE__*/function () {
-                  var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(body) {
-                    var validJson, result;
-                    return _regeneratorRuntime().wrap(function _callee$(_context) {
-                      while (1) {
-                        switch (_context.prev = _context.next) {
-                          case 0:
-                            _context.next = 2;
-                            return isJsonString(body);
+            _context.prev = 0;
+            requestOptions = {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'connectionparams': connectionParams
+              }
+            };
+            _context.next = 4;
+            return fetch(qlkubeUrl, requestOptions);
 
-                          case 2:
-                            validJson = _context.sent;
+          case 4:
+            qlkRes = _context.sent;
+            jsonRes = qlkRes.json();
+            return _context.abrupt("return", jsonRes);
 
-                            if (validJson) {
-                              result = processData(validJson, serverStatusCallback, res);
+          case 9:
+            _context.prev = 9;
+            _context.t0 = _context["catch"](0);
 
-                              if (!result.suspendResolve) {
-                                resolve(result);
-                              }
-                            } else {
-                              chunks.push(new Buffer.from(body));
-                            }
-
-                          case 4:
-                          case "end":
-                            return _context.stop();
-                        }
-                      }
-                    }, _callee);
-                  }));
-
-                  return function (_x4) {
-                    return _ref2.apply(this, arguments);
-                  };
-                }());
-                res.on('error', function (err) {
-                  throw new Error(err);
-                });
-                res.on('close', function (msg) {});
-                res.on('end', function () {
-                  if ((chunks === null || chunks === void 0 ? void 0 : chunks.length) > 0) {
-                    var data = Buffer.concat(chunks);
-                    var parsedChunks = JSON.parse(data);
-                    var result = processData(parsedChunks, serverStatusCallback, null);
-                    resolve(result);
-                  }
-                });
-              }).end(function () {});
-            });
-            return _context2.abrupt("return", httpRequestPromise);
-
-          case 10:
-            _context2.prev = 10;
-            _context2.t0 = _context2["catch"](0);
-
-          case 12:
+          case 11:
           case "end":
-            return _context2.stop();
+            return _context.stop();
         }
       }
-    }, _callee2, null, [[0, 10]]);
+    }, _callee, null, [[0, 9]]);
   }));
 
-  return function request(_x, _x2, _x3) {
+  return function basic_request(_x, _x2) {
     return _ref.apply(this, arguments);
   };
 }();
@@ -859,6 +828,31 @@ var useMonoSub = function useMonoSub() {
     socketStatus: socketStatus
   };
 }; // ## Webpack 5 issues
+// const useQuery = () => {
+//   const QLKUBE_PROVIDER = useContext(QlkubeContext);
+//   const { qlkubeUrl } = QLKUBE_PROVIDER;
+//   return async (
+//     authToken,
+//     clusterUrl,
+//     requestString,
+//     requestVariables,
+//     serverStatusCallback
+//   ) => {
+//     const requestParameters= JSON.stringify({
+//       authorization: `Bearer ${authToken}`,
+//       clusterUrl,
+//       query: requestString,
+//       queryVariables: requestVariables
+//     });
+//     const res = await request(
+//       requestParameters,
+//       qlkubeUrl,
+//       serverStatusCallback
+//     );
+//     return res
+//   }
+// }
+
 
 var useLink = function useLink() {
   var QLKUBE_PROVIDER = useContext(QlkubeContext);
@@ -879,4 +873,4 @@ var useLink = function useLink() {
   };
 };
 
-export { QlkubeContext, QlkubeProvider, request, subscribe, useLink, useMonoSub, useSub };
+export { QlkubeContext, QlkubeProvider, basic_request, subscribe, useLink, useMonoSub, useSub };
