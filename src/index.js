@@ -1,3 +1,2 @@
-export { subscribe } from './components/core/qlkubeRequests';
-export { QlkubeProvider, QlkubeContext } from './components/react/context/QlkubeProvider';
-export { useSub, useMonoSub, useLink } from './components/react/hooks/qlkubeHooks';
+export { subscribe, query } from './components/core/qlkubeRequests';
+export { useSub, useQuery } from './components/react/hooks/qlkubeHooks';
