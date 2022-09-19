@@ -47,7 +47,7 @@ export const subscribe = async (
     query: queryString,
     queryVariables
   };
-  const unsubscribe = client.subscribe(
+  client.subscribe(
     connectionParams,
     {
       next: onData,
@@ -55,5 +55,5 @@ export const subscribe = async (
       complete: onComplete,
     },
   );
-  return unsubscribe;
+  return client;
 };

@@ -470,7 +470,7 @@ var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVaria
 };
 var subscribe = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(qlkubeUrl, queryString, clusterUrl, token, queryVariables, onData, onError, onComplete) {
-    var client, connectionParams, unsubscribe;
+    var client, connectionParams;
     return _regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
@@ -484,12 +484,12 @@ var subscribe = /*#__PURE__*/function () {
               query: queryString,
               queryVariables: queryVariables
             };
-            unsubscribe = client.subscribe(connectionParams, {
+            client.subscribe(connectionParams, {
               next: onData,
               error: onError,
               complete: onComplete
             });
-            return _context.abrupt("return", unsubscribe);
+            return _context.abrupt("return", client);
 
           case 4:
           case "end":
