@@ -17,15 +17,18 @@ const useSub = () => {
       clusterUrl,
       token,
       queryVariables,
+      dataCallback,
+      errorCallback,
+      completeCallback
     ) => subscribe(
       qlkubeUrl,
       queryString,
       clusterUrl,
       token,
       queryVariables,
-      onData,
-      onError,
-      onComplete
+      dataCallback||onData,
+      errorCallback||onError,
+      completeCallback||onComplete
     ),
     eventData:data,
     error,
