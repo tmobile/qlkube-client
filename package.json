@@ -6,12 +6,13 @@
   "module": "dist/index.esm.js",
   "source": "src/index.js",
   "dependencies": {
+    "graphql-ws": "^5.11.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "build": "rollup -c",
-    "build-watch": "rollup -c -w", 
+    "build-watch": "rollup -c -w",
     "start-playground": "cd playground && npm run start",
     "i-all": "npm i && cd playground && npm i",
     "dev": "npm-run-all --parallel build-watch start-playground"
@@ -49,5 +50,4 @@
     "react": "^17.0.1 || ^18.0.0",
     "react-dom": "^17.0.1 || ^18.0.0"
   }
-
 }
