@@ -533,8 +533,8 @@ var useSub = function useSub() {
   };
 
   return {
-    subscribe: function subscribe$1(qlkubeUrl, queryString, clusterUrl, token, queryVariables) {
-      return subscribe(qlkubeUrl, queryString, clusterUrl, token, queryVariables, onData, onError, onComplete);
+    subscribe: function subscribe$1(qlkubeUrl, queryString, clusterUrl, token, queryVariables, dataCallback, errorCallback, completeCallback) {
+      return subscribe(qlkubeUrl, queryString, clusterUrl, token, queryVariables, dataCallback || onData, errorCallback || onError, completeCallback || onComplete);
     },
     eventData: data,
     error: error,
