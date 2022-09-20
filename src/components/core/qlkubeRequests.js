@@ -7,13 +7,6 @@ export const query = (
   token,
   queryVariables
 ) => {
-  // const connectionParams= {
-  //   authorization: `Bearer ${token}`,
-  //   clusterUrl,
-  //   query: queryString,
-  //   queryVariables
-  // };
-
   const connectionParams= {
     authorization: `Bearer ${token}`,
     clusterUrl,
@@ -21,8 +14,6 @@ export const query = (
     variables: queryVariables
   };
 
-  console.log('queryVariables', queryVariables)
-  console.log('queryString', queryString)
   const client = createClient({
     url: qlkubeUrl,
     connectionParams

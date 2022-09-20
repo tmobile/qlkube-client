@@ -442,20 +442,12 @@ function _nonIterableRest() {
 }
 
 var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVariables) {
-  // const connectionParams= {
-  //   authorization: `Bearer ${token}`,
-  //   clusterUrl,
-  //   query: queryString,
-  //   queryVariables
-  // };
   var connectionParams = {
     authorization: "Bearer ".concat(token),
     clusterUrl: clusterUrl,
     query: queryString,
     variables: queryVariables
   };
-  console.log('queryVariables', queryVariables);
-  console.log('queryString', queryString);
   var client = createClient({
     url: qlkubeUrl,
     connectionParams: connectionParams
