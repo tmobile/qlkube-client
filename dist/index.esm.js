@@ -450,7 +450,7 @@ var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVaria
   };
   var client = createClient({
     url: qlkubeUrl,
-    connectionParams: connectionParams
+    connectionParams: queryVariables
   });
   return new Promise(function (resolve, reject) {
     var result;

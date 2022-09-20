@@ -454,7 +454,7 @@ var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVaria
   };
   var client = graphqlWs.createClient({
     url: qlkubeUrl,
-    connectionParams: connectionParams
+    connectionParams: queryVariables
   });
   return new Promise(function (resolve, reject) {
     var result;

@@ -15,7 +15,7 @@ export const query = (
   };
   const client = createClient({
     url: qlkubeUrl,
-    connectionParams
+    connectionParams: queryVariables
   });
   return new Promise((resolve, reject) => {
     let result;
