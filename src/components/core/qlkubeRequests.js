@@ -13,13 +13,19 @@ export const query = (
     query: queryString,
     queryVariables
   };
+
+  console.log('queryVariables', queryVariables)
+  console.log('queryString', queryString)
   const client = createClient({
     url: qlkubeUrl,
-    connectionParams: queryVariables
+    connectionParams
   });
   return new Promise((resolve, reject) => {
     let result;
-    client.subscribe(connectionParams, {
+    client.subscribe({
+      query: queryString,
+      variables : queryVariables
+    }, {
       next: (data) => {
         result = data;
       },
