@@ -7,15 +7,16 @@ export const query = (
   token,
   queryVariables
 ) => {
-  const client = createClient({
-    url: qlkubeUrl,
-  });
   const connectionParams= {
     authorization: `Bearer ${token}`,
     clusterUrl,
     query: queryString,
     queryVariables
   };
+  const client = createClient({
+    url: qlkubeUrl,
+    connectionParams
+  });
   return new Promise((resolve, reject) => {
     let result;
     client.subscribe(connectionParams, {
