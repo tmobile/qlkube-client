@@ -7,11 +7,18 @@ export const query = (
   token,
   queryVariables
 ) => {
+  // const connectionParams= {
+  //   authorization: `Bearer ${token}`,
+  //   clusterUrl,
+  //   query: queryString,
+  //   queryVariables
+  // };
+
   const connectionParams= {
     authorization: `Bearer ${token}`,
     clusterUrl,
     query: queryString,
-    queryVariables
+    variables: queryVariables
   };
 
   console.log('queryVariables', queryVariables)
@@ -22,10 +29,7 @@ export const query = (
   });
   return new Promise((resolve, reject) => {
     let result;
-    client.subscribe({
-      query: queryString,
-      variables : queryVariables
-    }, {
+    client.subscribe(connectionParams, {
       next: (data) => {
         result = data;
       },

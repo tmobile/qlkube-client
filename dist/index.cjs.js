@@ -446,11 +446,17 @@ function _nonIterableRest() {
 }
 
 var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVariables) {
+  // const connectionParams= {
+  //   authorization: `Bearer ${token}`,
+  //   clusterUrl,
+  //   query: queryString,
+  //   queryVariables
+  // };
   var connectionParams = {
     authorization: "Bearer ".concat(token),
     clusterUrl: clusterUrl,
     query: queryString,
-    queryVariables: queryVariables
+    variables: queryVariables
   };
   console.log('queryVariables', queryVariables);
   console.log('queryString', queryString);
@@ -460,10 +466,7 @@ var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVaria
   });
   return new Promise(function (resolve, reject) {
     var result;
-    client.subscribe({
-      query: queryString,
-      variables: queryVariables
-    }, {
+    client.subscribe(connectionParams, {
       next: function next(data) {
         result = data;
       },
