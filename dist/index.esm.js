@@ -448,13 +448,18 @@ var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVaria
     query: queryString,
     queryVariables: queryVariables
   };
+  console.log('queryVariables', queryVariables);
+  console.log('queryString', queryString);
   var client = createClient({
     url: qlkubeUrl,
-    connectionParams: queryVariables
+    connectionParams: connectionParams
   });
   return new Promise(function (resolve, reject) {
     var result;
-    client.subscribe(connectionParams, {
+    client.subscribe({
+      query: queryString,
+      variables: queryVariables
+    }, {
       next: function next(data) {
         result = data;
       },
