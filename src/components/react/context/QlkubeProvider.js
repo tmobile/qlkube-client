@@ -1,18 +1,18 @@
 import { useState, createContext, useEffect } from 'react';
 export const QlkubeContext = createContext();
 
-const QLKubeProvider = ({ children, qlkubeOperatorUrl }) => {
-  const [operatorUrl, setOperatorUrl] = useState(null);
+const QLKubeProvider = ({ children, qlkubeRouterUrl }) => {
+  const [routerUrl, setRouterUrl] = useState(null);
 
   useEffect(() => {
-    setOperatorUrl(qlkubeOperatorUrl);
+    setRouterUrl(qlkubeRouterUrl);
   }, []);
 
  
   return (
     <QlkubeContext.Provider
       value={{
-        operatorUrl,
+        routerUrl,
       }}
     >
       {children}

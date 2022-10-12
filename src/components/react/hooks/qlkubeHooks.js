@@ -4,7 +4,7 @@ import { QlkubeContext } from '../context/QlkubeProvider';
 
 const useSub = () => {
   const QLKUBE_PROVIDER = useContext(QlkubeContext);
-  const { operatorUrl } = QLKUBE_PROVIDER;
+  const { routerUrl } = QLKUBE_PROVIDER;
 
   const [data, setData]= useState(null);
   const [error, setError]= useState(null);
@@ -16,6 +16,7 @@ const useSub = () => {
 
   return {
     subscribe: (
+      clusterName,
       queryString,
       clusterUrl,
       token,
@@ -24,6 +25,7 @@ const useSub = () => {
       errorCallback,
       completeCallback
     ) => subscribe(
+      `${routerUrl}/${clusterName}/gql`,
       operatorUrl,
       queryString,
       clusterUrl,
@@ -41,17 +43,18 @@ const useSub = () => {
 
 const useQuery = () => {
   const QLKUBE_PROVIDER = useContext(QlkubeContext);
-  const { operatorUrl } = QLKUBE_PROVIDER;
+  const { routerUrl } = QLKUBE_PROVIDER;
 
   return {
     query: (
+      clusterName,
       queryString, 
       clusterUrl, 
       token,
       queryVariables
     ) => {
       return query(
-        operatorUrl,
+        `${routerUrl}/${clusterName}/gql`,
         queryString, 
         clusterUrl, 
         token,

@@ -510,19 +510,19 @@ var QlkubeContext = /*#__PURE__*/react.createContext();
 
 var QLKubeProvider = function QLKubeProvider(_ref) {
   var children = _ref.children,
-      qlkubeOperatorUrl = _ref.qlkubeOperatorUrl;
+      qlkubeRouterUrl = _ref.qlkubeRouterUrl;
 
   var _useState = react.useState(null),
       _useState2 = _slicedToArray(_useState, 2),
-      operatorUrl = _useState2[0],
-      setOperatorUrl = _useState2[1];
+      routerUrl = _useState2[0],
+      setRouterUrl = _useState2[1];
 
   react.useEffect(function () {
-    setOperatorUrl(qlkubeOperatorUrl);
+    setRouterUrl(qlkubeRouterUrl);
   }, []);
   return /*#__PURE__*/jsxRuntime.jsx(QlkubeContext.Provider, {
     value: {
-      operatorUrl: operatorUrl
+      routerUrl: routerUrl
     },
     children: children
   });
@@ -530,7 +530,7 @@ var QLKubeProvider = function QLKubeProvider(_ref) {
 
 var useSub = function useSub() {
   var QLKUBE_PROVIDER = useContext(QlkubeContext);
-  var operatorUrl = QLKUBE_PROVIDER.operatorUrl;
+  var routerUrl = QLKUBE_PROVIDER.routerUrl;
 
   var _useState = react.useState(null),
       _useState2 = _slicedToArray(_useState, 2),
@@ -560,8 +560,8 @@ var useSub = function useSub() {
   };
 
   return {
-    subscribe: function subscribe$1(queryString, clusterUrl, token, queryVariables, dataCallback, errorCallback, completeCallback) {
-      return subscribe(operatorUrl, queryString, clusterUrl, token, queryVariables, dataCallback || onData, errorCallback || onError, completeCallback || onComplete);
+    subscribe: function subscribe$1(clusterName, queryString, clusterUrl, token, queryVariables, dataCallback, errorCallback, completeCallback) {
+      return subscribe("".concat(routerUrl, "/").concat(clusterName, "/gql"), operatorUrl, queryString, clusterUrl, token, queryVariables, dataCallback || onData, errorCallback || onError, completeCallback || onComplete);
     },
     eventData: data,
     error: error,
@@ -571,10 +571,10 @@ var useSub = function useSub() {
 
 var useQuery = function useQuery() {
   var QLKUBE_PROVIDER = useContext(QlkubeContext);
-  var operatorUrl = QLKUBE_PROVIDER.operatorUrl;
+  var routerUrl = QLKUBE_PROVIDER.routerUrl;
   return {
-    query: function query$1(queryString, clusterUrl, token, queryVariables) {
-      return query(operatorUrl, queryString, clusterUrl, token, queryVariables);
+    query: function query$1(clusterName, queryString, clusterUrl, token, queryVariables) {
+      return query("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables);
     }
   };
 };
