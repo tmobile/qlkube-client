@@ -4,7 +4,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var graphqlWs = require('graphql-ws');
 var react = require('react');
-require('react/jsx-runtime');
+var jsxRuntime = require('react/jsx-runtime');
 
 function _regeneratorRuntime() {
   /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
@@ -508,6 +508,26 @@ var subscribe = /*#__PURE__*/function () {
 
 var QlkubeContext = /*#__PURE__*/react.createContext();
 
+var QLKubeProvider = function QLKubeProvider(_ref) {
+  var children = _ref.children,
+      qlkubeOperatorUrl = _ref.qlkubeOperatorUrl;
+
+  var _useState = react.useState(null),
+      _useState2 = _slicedToArray(_useState, 2),
+      operatorUrl = _useState2[0],
+      setOperatorUrl = _useState2[1];
+
+  react.useEffect(function () {
+    setOperatorUrl(qlkubeOperatorUrl);
+  }, []);
+  return /*#__PURE__*/jsxRuntime.jsx(QlkubeContext.Provider, {
+    value: {
+      operatorUrl: operatorUrl
+    },
+    children: children
+  });
+};
+
 var useSub = function useSub() {
   var QLKUBE_PROVIDER = useContext(QlkubeContext);
   var operatorUrl = QLKUBE_PROVIDER.operatorUrl;
@@ -559,6 +579,7 @@ var useQuery = function useQuery() {
   };
 };
 
+exports.QLKubeProvider = QLKubeProvider;
 exports.query = query;
 exports.subscribe = subscribe;
 exports.useQuery = useQuery;

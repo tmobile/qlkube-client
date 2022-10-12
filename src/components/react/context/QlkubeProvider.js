@@ -1,7 +1,7 @@
 import { useState, createContext, useEffect } from 'react';
 export const QlkubeContext = createContext();
 
-const QlkubeProvider = ({ children, qlkubeOperatorUrl }) => {
+const QLKubeProvider = ({ children, qlkubeOperatorUrl }) => {
   const [operatorUrl, setOperatorUrl] = useState(null);
 
   useEffect(() => {
@@ -20,4 +20,4 @@ const QlkubeProvider = ({ children, qlkubeOperatorUrl }) => {
   );
 };
 
-export { QlkubeProvider };
+export { QLKubeProvider };
