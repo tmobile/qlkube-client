@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { subscribe ,query } from '../../core/qlkubeRequests';
+import { QlkubeContext } from '../context/QlkubeProvider';
 
 const useSub = () => {
+  const QLKUBE_PROVIDER = useContext(QlkubeContext);
+  const { operatorUrl } = QLKUBE_PROVIDER;
+
   const [data, setData]= useState(null);
   const [error, setError]= useState(null);
   const [isComplete, setIsComplete]= useState(false);
@@ -12,7 +16,6 @@ const useSub = () => {
 
   return {
     subscribe: (
-      qlkubeUrl,
       queryString,
       clusterUrl,
       token,
@@ -21,7 +24,7 @@ const useSub = () => {
       errorCallback,
       completeCallback
     ) => subscribe(
-      qlkubeUrl,
+      operatorUrl,
       queryString,
       clusterUrl,
       token,
@@ -37,16 +40,18 @@ const useSub = () => {
 }
 
 const useQuery = () => {
+  const QLKUBE_PROVIDER = useContext(QlkubeContext);
+  const { operatorUrl } = QLKUBE_PROVIDER;
+
   return {
     query: (
-      qlkubeUrl,
       queryString, 
       clusterUrl, 
       token,
       queryVariables
     ) => {
       return query(
-        qlkubeUrl,
+        operatorUrl,
         queryString, 
         clusterUrl, 
         token,
