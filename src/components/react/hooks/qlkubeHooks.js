@@ -13,7 +13,6 @@ const useSub = () => {
   const onData = (data) => setData(data)
   const onError = (e) => setError(e)
   const onComplete = () => setIsComplete(true)
-
   return {
     subscribe: (
       clusterName,
@@ -24,7 +23,10 @@ const useSub = () => {
       dataCallback,
       errorCallback,
       completeCallback
-    ) => subscribe(
+    ) => {
+      console.log('qlkube-client', `${routerUrl}/${clusterName}/gql`)
+
+      subscribe(
       `${routerUrl}/${clusterName}/gql`,
       operatorUrl,
       queryString,
@@ -34,7 +36,8 @@ const useSub = () => {
       dataCallback||onData,
       errorCallback||onError,
       completeCallback||onComplete
-    ),
+    )
+  },
     eventData:data,
     error,
     isComplete
