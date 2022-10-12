@@ -1,5 +1,5 @@
 import { createClient } from 'graphql-ws';
-import { useState, useEffect, createContext } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { jsx } from 'react/jsx-runtime';
 
 function _regeneratorRuntime() {

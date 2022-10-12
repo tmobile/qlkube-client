@@ -529,7 +529,7 @@ var QLKubeProvider = function QLKubeProvider(_ref) {
 };
 
 var useSub = function useSub() {
-  var QLKUBE_PROVIDER = useContext(QlkubeContext);
+  var QLKUBE_PROVIDER = react.useContext(QlkubeContext);
   var routerUrl = QLKUBE_PROVIDER.routerUrl;
 
   var _useState = react.useState(null),
@@ -570,7 +570,7 @@ var useSub = function useSub() {
 };
 
 var useQuery = function useQuery() {
-  var QLKUBE_PROVIDER = useContext(QlkubeContext);
+  var QLKUBE_PROVIDER = react.useContext(QlkubeContext);
   var routerUrl = QLKUBE_PROVIDER.routerUrl;
   return {
     query: function query$1(clusterName, queryString, clusterUrl, token, queryVariables) {
