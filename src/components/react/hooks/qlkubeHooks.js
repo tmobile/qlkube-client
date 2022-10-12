@@ -28,7 +28,6 @@ const useSub = () => {
 
       subscribe(
       `${routerUrl}/${clusterName}/gql`,
-      operatorUrl,
       queryString,
       clusterUrl,
       token,

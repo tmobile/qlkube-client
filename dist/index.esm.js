@@ -559,7 +559,7 @@ var useSub = function useSub() {
     subscribe: function subscribe$1(clusterName, queryString, clusterUrl, token, queryVariables, dataCallback, errorCallback, completeCallback) {
       console.log('qlkube-client', "".concat(routerUrl, "/").concat(clusterName, "/gql"));
 
-      subscribe("".concat(routerUrl, "/").concat(clusterName, "/gql"), operatorUrl, queryString, clusterUrl, token, queryVariables, dataCallback || onData, errorCallback || onError, completeCallback || onComplete);
+      subscribe("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, dataCallback || onData, errorCallback || onError, completeCallback || onComplete);
     },
     eventData: data,
     error: error,
