@@ -1,112 +1,6 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createClient } from 'graphql-ws';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { jsx } from 'react/jsx-runtime';
-
-var ServerStatus = {
-  exists: 'exists',
-  generating: 'generating',
-  complete: 'complete'
-};
-
-// const urlParse = require('url');
-// const https = require('http');
-
-var clientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
-
-function SubscriptionHandle(queryString, subscriptionId, unsubscribe) {
-  this.queryString = queryString;
-  this.subscriptionId = subscriptionId;
-  this.unsubscribe = unsubscribe;
-}
-
-var subscribe = function subscribe(queryString, clusterUrl, token, ws, isMono, connectionParams) {
-  var messageServer = function messageServer(msg) {
-    ws === null || ws === void 0 ? void 0 : ws.send(msg);
-  };
-
-  var subscriptionId = "subscription-".concat(Date.now().toString(36) + Math.random().toString(36).substring(1, 10));
-
-  if (isMono) {
-    var monoClientId = "client-".concat(Date.now().toString(36) + Math.random().toString(36).substr(2));
-    messageServer(JSON.stringify({
-      requestType: 'subscribe_mono',
-      clientId: monoClientId,
-      connectionParams: connectionParams
-    }));
-    return new SubscriptionHandle(queryString, subscriptionId, function () {
-      return messageServer(JSON.stringify({
-        requestType: 'close',
-        connectionParams: {
-          clusterUrl: clusterUrl,
-          clientId: monoClientId,
-          clientSubId: "".concat(subscriptionId)
-        }
-      }));
-    });
-  } else {
-    messageServer(JSON.stringify({
-      requestType: 'subscribe',
-      clientId: clientId,
-      query: queryString,
-      connectionParams: {
-        authorization: "Bearer ".concat(token),
-        clusterUrl: clusterUrl,
-        clientId: clientId,
-        clientSubId: subscriptionId
-      }
-    }));
-    return new SubscriptionHandle(queryString, subscriptionId, function () {
-      return messageServer(JSON.stringify({
-        requestType: 'close',
-        connectionParams: {
-          clusterUrl: clusterUrl,
-          clientId: clientId,
-          clientSubId: "".concat(subscriptionId)
-        }
-      }));
-    });
-  }
-}; // ## Issues with web pack 5 
-// export const request = async (
-//   connectionParams,
-//   qlkubeUrl,
-//   serverStatusCallback
-// ) => {
-//   try {
-//     const opts = urlParse.parse(qlkubeUrl)
-//     opts.headers = {};
-//     opts.headers['Content-Type'] = 'application/json';
-//     opts.headers['connectionParams'] = connectionParams;
-//     opts['timeout'] = 500000;
-//     const httpRequestPromise= new Promise((resolve, reject) => {
-//       https.request(opts, function (res) {
-//         let chunks = []
-//         res.setEncoding('utf8');
-//         res.on('data', async function (body) {
-//           const validJson= await isJsonString(body);
-//           if(validJson){
-//             const result= processData(validJson, serverStatusCallback, res);
-//             if(!result.suspendResolve){
-//               resolve(result)
-//             }else{}
-//           }else{
-//             chunks.push(new Buffer.from(body))
-//           }
-//         });
-//         res.on('error', (err) => {throw new Error(err)});
-//         res.on('close', (msg) => {});
-//         res.on('end', function () {
-//           if(chunks?.length>0){
-//             const data = Buffer.concat(chunks);
-//             const parsedChunks = JSON.parse(data);
-//             const result= processData(parsedChunks, serverStatusCallback, null);
-//             resolve(result)
-//           }
-//         })
-//       }).end(() => {});
-//     })
-//     return httpRequestPromise;
-//   } catch (error) {}
-// };
 
 function _regeneratorRuntime() {
   /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
@@ -548,140 +442,83 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
+var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVariables) {
+  var connectionParams = {
+    authorization: "Bearer ".concat(token),
+    clusterUrl: clusterUrl,
+    query: queryString,
+    variables: queryVariables
+  };
+  var client = createClient({
+    url: qlkubeUrl,
+    connectionParams: connectionParams
+  });
+  return new Promise(function (resolve, reject) {
+    var result;
+    client.subscribe(connectionParams, {
+      next: function next(data) {
+        result = data;
+      },
+      error: reject,
+      complete: function complete() {
+        return resolve(result);
+      }
+    });
+  });
+};
+var subscribe = /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(qlkubeUrl, queryString, clusterUrl, token, queryVariables, onData, onError, onComplete) {
+    var client, connectionParams;
+    return _regeneratorRuntime().wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            client = createClient({
+              url: qlkubeUrl
+            });
+            connectionParams = {
+              authorization: "Bearer ".concat(token),
+              clusterUrl: clusterUrl,
+              query: queryString,
+              queryVariables: queryVariables
+            };
+            client.subscribe(connectionParams, {
+              next: onData,
+              error: onError,
+              complete: onComplete
+            });
+            return _context.abrupt("return", client);
+
+          case 4:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+
+  return function subscribe(_x, _x2, _x3, _x4, _x5, _x6, _x7, _x8) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
 var QlkubeContext = /*#__PURE__*/createContext();
 
-var QlkubeProvider = function QlkubeProvider(_ref) {
+var QLKubeProvider = function QLKubeProvider(_ref) {
   var children = _ref.children,
-      wsUrl = _ref.wsUrl,
-      queryUrl = _ref.queryUrl,
-      doKeepAlive = _ref.doKeepAlive,
-      _ref$pingTimeout = _ref.pingTimeout,
-      pingTimeout = _ref$pingTimeout === void 0 ? 20000 : _ref$pingTimeout;
+      qlkubeRouterUrl = _ref.qlkubeRouterUrl;
 
   var _useState = useState(null),
       _useState2 = _slicedToArray(_useState, 2),
-      ws = _useState2[0],
-      setWs = _useState2[1];
-
-  var _useState3 = useState(null),
-      _useState4 = _slicedToArray(_useState3, 2),
-      socketState = _useState4[0],
-      setSocketState = _useState4[1];
-
-  var _useState5 = useState(null),
-      _useState6 = _slicedToArray(_useState5, 2),
-      qlkubeSocketStatus = _useState6[0],
-      setQlkubeSocketStatus = _useState6[1];
-
-  var reconnect = /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      return _regeneratorRuntime().wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              if (!ws) {
-                _context.next = 3;
-                break;
-              }
-
-              _context.next = 3;
-              return ws === null || ws === void 0 ? void 0 : ws.close();
-
-            case 3:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, _callee);
-    }));
-
-    return function reconnect() {
-      return _ref2.apply(this, arguments);
-    };
-  }();
-
-  var updateQlkubeSocketStatus = function updateQlkubeSocketStatus(stat) {
-    setQlkubeSocketStatus(stat);
-  };
+      routerUrl = _useState2[0],
+      setRouterUrl = _useState2[1];
 
   useEffect(function () {
-    connectWs();
+    setRouterUrl(qlkubeRouterUrl);
   }, []);
-  useEffect(function () {
-    var pingIntervalRef;
-
-    if (doKeepAlive && ws && socketState) {
-      pingIntervalRef = serverPingPong();
-    }
-
-    return function () {
-      return pingIntervalRef && clearInterval(pingIntervalRef);
-    };
-  }, [ws, socketState]);
-
-  var serverPingPong = function serverPingPong() {
-    return setInterval(function () {
-      ws && socketState && ws.send('ping');
-    }, pingTimeout);
-  };
-
-  var connectWs = /*#__PURE__*/function () {
-    var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-      var _ws;
-
-      return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              if (!ws) {
-                _context2.next = 3;
-                break;
-              }
-
-              _context2.next = 3;
-              return ws === null || ws === void 0 ? void 0 : ws.close();
-
-            case 3:
-              _ws = new WebSocket(wsUrl);
-              setWs(function (prev) {
-                return _ws;
-              });
-
-              _ws.onopen = function () {
-                setSocketState(true);
-              };
-
-              _ws.onclose = function (e) {
-                setSocketState(false);
-                setTimeout(function () {
-                  connectWs();
-                }, 1000);
-              };
-
-              _ws.onerror = function (err) {};
-
-            case 8:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, _callee2);
-    }));
-
-    return function connectWs() {
-      return _ref3.apply(this, arguments);
-    };
-  }();
-
   return /*#__PURE__*/jsx(QlkubeContext.Provider, {
     value: {
-      ws: ws,
-      socketState: socketState,
-      qlkubeSocketStatus: qlkubeSocketStatus,
-      qlkubeUrl: queryUrl,
-      qlkubeUrl_ws: wsUrl,
-      reconnect: reconnect,
-      updateQlkubeSocketStatus: updateQlkubeSocketStatus
+      routerUrl: routerUrl
     },
     children: children
   });
@@ -689,10 +526,7 @@ var QlkubeProvider = function QlkubeProvider(_ref) {
 
 var useSub = function useSub() {
   var QLKUBE_PROVIDER = useContext(QlkubeContext);
-  var _ws = QLKUBE_PROVIDER.ws;
-      QLKUBE_PROVIDER.socketState;
-      QLKUBE_PROVIDER.qlkubeSocketStatus;
-      var updateQlkubeSocketStatus = QLKUBE_PROVIDER.updateQlkubeSocketStatus;
+  var routerUrl = QLKUBE_PROVIDER.routerUrl;
 
   var _useState = useState(null),
       _useState2 = _slicedToArray(_useState, 2),
@@ -701,136 +535,46 @@ var useSub = function useSub() {
 
   var _useState3 = useState(null),
       _useState4 = _slicedToArray(_useState3, 2),
-      socketStatus = _useState4[0],
-      setSocketStatus = _useState4[1];
+      error = _useState4[0],
+      setError = _useState4[1];
 
-  useEffect(function () {
-    _ws.onmessage = function (evt) {
-      var received_msg = evt.data;
-      var jsonData = JSON.parse(received_msg);
-      var eventData = jsonData === null || jsonData === void 0 ? void 0 : jsonData.data;
-      var statusData = jsonData === null || jsonData === void 0 ? void 0 : jsonData.status;
-      statusData === 'exists' && updateQlkubeSocketStatus('exists');
-      statusData === 'generating' && updateQlkubeSocketStatus('generating');
-      statusData && setSocketStatus(function (prev) {
-        return statusData;
-      });
-      eventData && setData(function (prev) {
-        return eventData;
-      });
-    };
+  var _useState5 = useState(false),
+      _useState6 = _slicedToArray(_useState5, 2),
+      isComplete = _useState6[0],
+      setIsComplete = _useState6[1];
 
-    return function () {};
-  }, []);
+  var onData = function onData(data) {
+    return setData(data);
+  };
+
+  var onError = function onError(e) {
+    return setError(e);
+  };
+
+  var onComplete = function onComplete() {
+    return setIsComplete(true);
+  };
+
   return {
-    subscribe: function subscribe$1(query, clusterUrl, token) {
-      return subscribe(query, clusterUrl, token, _ws);
+    subscribe: function subscribe$1(clusterName, queryString, clusterUrl, token, queryVariables, dataCallback, errorCallback, completeCallback) {
+      console.log('qlkube-client', "".concat(routerUrl, "/").concat(clusterName, "/gql"));
+
+      subscribe("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, dataCallback || onData, errorCallback || onError, completeCallback || onComplete);
     },
     eventData: data,
-    serverStatus: socketStatus
+    error: error,
+    isComplete: isComplete
   };
 };
 
-var useMonoSub = function useMonoSub() {
+var useQuery = function useQuery() {
   var QLKUBE_PROVIDER = useContext(QlkubeContext);
-  var qlkubeUrl_ws = QLKUBE_PROVIDER.qlkubeUrl_ws;
-
-  var _useState5 = useState(null),
-      _useState6 = _slicedToArray(_useState5, 2),
-      socketStatus = _useState6[0];
-      _useState6[1];
-
+  var routerUrl = QLKUBE_PROVIDER.routerUrl;
   return {
-    monoSub: function monoSub(authToken, clusterUrl, requestString, requestVariables, serverStatusCallback, errorCallback) {
-      return new Promise(function (resolve, reject) {
-        var requestParameters = JSON.stringify({
-          authorization: "Bearer ".concat(authToken),
-          clusterUrl: clusterUrl,
-          query: requestString,
-          queryVariables: requestVariables
-        });
-
-        var _ws = new WebSocket(qlkubeUrl_ws);
-
-        var subHandle;
-
-        _ws.onopen = function () {
-          subHandle = subscribe(null, clusterUrl, null, _ws, true, requestParameters);
-        };
-
-        _ws.onmessage = function (evt) {
-          var received_msg = evt.data;
-          var jsonData = JSON.parse(received_msg);
-          var eventData = jsonData === null || jsonData === void 0 ? void 0 : jsonData.data;
-          var statusData = jsonData === null || jsonData === void 0 ? void 0 : jsonData.status;
-
-          if (eventData) {
-            if (eventData.error && errorCallback) {
-              var _eventData$error, _eventData$error$erro;
-
-              var errorReason = (_eventData$error = eventData.error) === null || _eventData$error === void 0 ? void 0 : (_eventData$error$erro = _eventData$error.errorPayload) === null || _eventData$error$erro === void 0 ? void 0 : _eventData$error$erro.reason;
-              errorCallback('qlkube error', errorReason || 'error fetching gql data');
-            }
-
-            resolve({
-              data: eventData
-            });
-            subHandle.unsubscribe();
-
-            _ws.close();
-          } else if (statusData && serverStatusCallback) {
-            statusData === ServerStatus.generating && serverStatusCallback(ServerStatus.generating);
-            statusData === ServerStatus.exists && serverStatusCallback(ServerStatus.exists);
-          }
-        };
-      });
-    },
-    socketStatus: socketStatus
-  };
-}; // ## Webpack 5 issues
-// const useQuery = () => {
-//   const QLKUBE_PROVIDER = useContext(QlkubeContext);
-//   const { qlkubeUrl } = QLKUBE_PROVIDER;
-//   return async (
-//     authToken,
-//     clusterUrl,
-//     requestString,
-//     requestVariables,
-//     serverStatusCallback
-//   ) => {
-//     const requestParameters= JSON.stringify({
-//       authorization: `Bearer ${authToken}`,
-//       clusterUrl,
-//       query: requestString,
-//       queryVariables: requestVariables
-//     });
-//     const res = await request(
-//       requestParameters,
-//       qlkubeUrl,
-//       serverStatusCallback
-//     );
-//     return res
-//   }
-// }
-
-
-var useLink = function useLink() {
-  var QLKUBE_PROVIDER = useContext(QlkubeContext);
-  var socketState = QLKUBE_PROVIDER.socketState,
-      ws = QLKUBE_PROVIDER.ws;
-
-  var _useState7 = useState(null),
-      _useState8 = _slicedToArray(_useState7, 2),
-      connectStatus = _useState8[0],
-      setConnectStatu = _useState8[1];
-
-  useEffect(function () {
-    setConnectStatu(socketState);
-  }, [socketState]);
-  return {
-    socketState: connectStatus,
-    ws: ws
+    query: function query$1(clusterName, queryString, clusterUrl, token, queryVariables) {
+      return query("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables);
+    }
   };
 };
 
-export { QlkubeContext, QlkubeProvider, subscribe, useLink, useMonoSub, useSub };
+export { QLKubeProvider, query, subscribe, useQuery, useSub };
