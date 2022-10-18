@@ -23,10 +23,7 @@ const useSub = () => {
       dataCallback,
       errorCallback,
       completeCallback
-    ) => {
-      console.log('qlkube-client', `${routerUrl}/${clusterName}/gql`)
-
-      subscribe(
+    ) => subscribe(
       `${routerUrl}/${clusterName}/gql`,
       queryString,
       clusterUrl,
@@ -35,8 +32,7 @@ const useSub = () => {
       dataCallback||onData,
       errorCallback||onError,
       completeCallback||onComplete
-    )
-  },
+    ),
     eventData:data,
     error,
     isComplete
@@ -46,7 +42,6 @@ const useSub = () => {
 const useQuery = () => {
   const QLKUBE_PROVIDER = useContext(QlkubeContext);
   const { routerUrl } = QLKUBE_PROVIDER;
-
   return {
     query: (
       clusterName,
