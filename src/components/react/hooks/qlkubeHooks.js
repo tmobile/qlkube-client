@@ -22,7 +22,8 @@ const useSub = () => {
       queryVariables,
       dataCallback,
       errorCallback,
-      completeCallback
+      completeCallback,
+      selfManagedClient
     ) => subscribe(
       `${routerUrl}/${clusterName}/gql`,
       queryString,
@@ -31,7 +32,8 @@ const useSub = () => {
       queryVariables,
       dataCallback||onData,
       errorCallback||onError,
-      completeCallback||onComplete
+      completeCallback||onComplete,
+      selfManagedClient
     ),
     eventData:data,
     error,
@@ -48,14 +50,17 @@ const useQuery = () => {
       queryString, 
       clusterUrl, 
       token,
-      queryVariables
+      queryVariables,
+      selfManagedClient
     ) => {
+      if(!(routerUrl&&queryString)) return {error: 'invalid parameters'};
       return query(
         `${routerUrl}/${clusterName}/gql`,
         queryString, 
         clusterUrl, 
         token,
-        queryVariables
+        queryVariables,
+        selfManagedClient
       )
     }
   }

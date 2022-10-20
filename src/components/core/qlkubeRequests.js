@@ -5,7 +5,8 @@ export const query = (
   queryString, 
   clusterUrl, 
   token,
-  queryVariables
+  queryVariables,
+  selfManagedClient
 ) => {
   const connectionParams= {
     authorization: `Bearer ${token}`,
@@ -13,8 +14,7 @@ export const query = (
     query: queryString,
     variables: queryVariables
   };
-
-  const client = createClient({
+  const client = selfManagedClient ? selfManagedClient : createClient({
     url: qlkubeUrl,
     connectionParams
   });
@@ -38,9 +38,10 @@ export const subscribe = async (
   queryVariables,
   onData,
   onError,
-  onComplete
+  onComplete,
+  selfManagedClient
 ) => {
-  const client = createClient({
+  const client = selfManagedClient ? selfManagedClient : createClient({
     url: qlkubeUrl,
   });
   const connectionParams = {
