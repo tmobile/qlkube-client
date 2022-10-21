@@ -446,14 +446,14 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
-var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVariables) {
+var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVariables, selfManagedClient) {
   var connectionParams = {
     authorization: "Bearer ".concat(token),
     clusterUrl: clusterUrl,
     query: queryString,
     variables: queryVariables
   };
-  var client = graphqlWs.createClient({
+  var client = selfManagedClient ? selfManagedClient : graphqlWs.createClient({
     url: qlkubeUrl,
     connectionParams: connectionParams
   });
@@ -471,13 +471,13 @@ var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVaria
   });
 };
 var subscribe = /*#__PURE__*/function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(qlkubeUrl, queryString, clusterUrl, token, queryVariables, onData, onError, onComplete) {
+  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(qlkubeUrl, queryString, clusterUrl, token, queryVariables, onData, onError, onComplete, selfManagedClient) {
     var client, connectionParams;
     return _regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            client = graphqlWs.createClient({
+            client = selfManagedClient ? selfManagedClient : graphqlWs.createClient({
               url: qlkubeUrl
             });
             connectionParams = {
@@ -501,7 +501,7 @@ var subscribe = /*#__PURE__*/function () {
     }, _callee);
   }));
 
-  return function subscribe(_x, _x2, _x3, _x4, _x5, _x6, _x7, _x8) {
+  return function subscribe(_x, _x2, _x3, _x4, _x5, _x6, _x7, _x8, _x9) {
     return _ref.apply(this, arguments);
   };
 }();
@@ -560,8 +560,8 @@ var useSub = function useSub() {
   };
 
   return {
-    subscribe: function subscribe$1(clusterName, queryString, clusterUrl, token, queryVariables, dataCallback, errorCallback, completeCallback) {
-      return subscribe("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, dataCallback || onData, errorCallback || onError, completeCallback || onComplete);
+    subscribe: function subscribe$1(clusterName, queryString, clusterUrl, token, queryVariables, dataCallback, errorCallback, completeCallback, selfManagedClient) {
+      return subscribe("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, dataCallback || onData, errorCallback || onError, completeCallback || onComplete, selfManagedClient);
     },
     eventData: data,
     error: error,
@@ -573,8 +573,11 @@ var useQuery = function useQuery() {
   var QLKUBE_PROVIDER = react.useContext(QlkubeContext);
   var routerUrl = QLKUBE_PROVIDER.routerUrl;
   return {
-    query: function query$1(clusterName, queryString, clusterUrl, token, queryVariables) {
-      return query("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables);
+    query: function query$1(clusterName, queryString, clusterUrl, token, queryVariables, selfManagedClient) {
+      if (!routerUrl || routerUrl === null) return {
+        error: 'invalid parameters'
+      };
+      return query("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, selfManagedClient);
     }
   };
 };
