@@ -1,5 +1,5 @@
 import { createClient } from 'graphql-ws';
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, createContext, useContext } from 'react';
 import { jsx } from 'react/jsx-runtime';
 
 function _regeneratorRuntime() {
@@ -508,14 +508,11 @@ var QLKubeProvider = function QLKubeProvider(_ref) {
   var children = _ref.children,
       qlkubeRouterUrl = _ref.qlkubeRouterUrl;
 
-  var _useState = useState(null),
+  var _useState = useState(qlkubeRouterUrl),
       _useState2 = _slicedToArray(_useState, 2),
-      routerUrl = _useState2[0],
-      setRouterUrl = _useState2[1];
+      routerUrl = _useState2[0];
+      _useState2[1];
 
-  useEffect(function () {
-    setRouterUrl(qlkubeRouterUrl);
-  }, []);
   return /*#__PURE__*/jsx(QlkubeContext.Provider, {
     value: {
       routerUrl: routerUrl

@@ -512,14 +512,11 @@ var QLKubeProvider = function QLKubeProvider(_ref) {
   var children = _ref.children,
       qlkubeRouterUrl = _ref.qlkubeRouterUrl;
 
-  var _useState = react.useState(null),
+  var _useState = react.useState(qlkubeRouterUrl),
       _useState2 = _slicedToArray(_useState, 2),
-      routerUrl = _useState2[0],
-      setRouterUrl = _useState2[1];
+      routerUrl = _useState2[0];
+      _useState2[1];
 
-  react.useEffect(function () {
-    setRouterUrl(qlkubeRouterUrl);
-  }, []);
   return /*#__PURE__*/jsxRuntime.jsx(QlkubeContext.Provider, {
     value: {
       routerUrl: routerUrl
