@@ -51,11 +51,12 @@ const useQuery = () => {
       clusterUrl, 
       token,
       queryVariables,
-      selfManagedClient
+      selfManagedClient,
+      _routerUrl
     ) => {
-      if(!routerUrl||routerUrl===null) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
+      if((!routerUrl||routerUrl===null)&&!_routerUrl) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
       return query(
-        `${routerUrl}/${clusterName}/gql`,
+        `${routerUrl||_routerUrl}/${clusterName}/gql`,
         queryString, 
         clusterUrl, 
         token,

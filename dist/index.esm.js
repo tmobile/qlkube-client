@@ -566,13 +566,13 @@ var useQuery = function useQuery() {
   var QLKUBE_PROVIDER = useContext(QlkubeContext);
   var routerUrl = QLKUBE_PROVIDER.routerUrl;
   return {
-    query: function query$1(clusterName, queryString, clusterUrl, token, queryVariables, selfManagedClient) {
-      if (!routerUrl || routerUrl === null) return new Promise(function (res, rej) {
+    query: function query$1(clusterName, queryString, clusterUrl, token, queryVariables, selfManagedClient, _routerUrl) {
+      if ((!routerUrl || routerUrl === null) && !_routerUrl) return new Promise(function (res, rej) {
         return rej({
           error: 'invalid parameters'
         });
       });
-      return query("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables);
+      return query("".concat(routerUrl || _routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables);
     }
   };
 };
