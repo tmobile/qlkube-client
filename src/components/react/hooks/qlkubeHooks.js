@@ -53,7 +53,7 @@ const useQuery = () => {
       queryVariables,
       selfManagedClient
     ) => {
-      if(!routerUrl||routerUrl===null) return {error: 'invalid parameters'};
+      if(!routerUrl||routerUrl===null) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
       return query(
         `${routerUrl}/${clusterName}/gql`,
         queryString, 

@@ -5,8 +5,7 @@ export const query = (
   queryString, 
   clusterUrl, 
   token,
-  queryVariables,
-  selfManagedClient
+  queryVariables
 ) => {
   const connectionParams= {
     authorization: `Bearer ${token}`,
@@ -14,7 +13,7 @@ export const query = (
     query: queryString,
     variables: queryVariables
   };
-  const client = selfManagedClient ? selfManagedClient : createClient({
+  const client = createClient({
     url: qlkubeUrl,
     connectionParams
   });
