@@ -446,14 +446,14 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
-var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVariables, selfManagedClient) {
+var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVariables) {
   var connectionParams = {
     authorization: "Bearer ".concat(token),
     clusterUrl: clusterUrl,
     query: queryString,
     variables: queryVariables
   };
-  var client = selfManagedClient ? selfManagedClient : graphqlWs.createClient({
+  var client = graphqlWs.createClient({
     url: qlkubeUrl,
     connectionParams: connectionParams
   });
@@ -571,10 +571,12 @@ var useQuery = function useQuery() {
   var routerUrl = QLKUBE_PROVIDER.routerUrl;
   return {
     query: function query$1(clusterName, queryString, clusterUrl, token, queryVariables, selfManagedClient) {
-      if (!routerUrl || routerUrl === null) return {
-        error: 'invalid parameters'
-      };
-      return query("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, selfManagedClient);
+      if (!routerUrl || routerUrl === null) return new Promise(function (res, rej) {
+        return rej({
+          error: 'invalid parameters'
+        });
+      });
+      return query("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables);
     }
   };
 };
