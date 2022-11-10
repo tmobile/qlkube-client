@@ -442,14 +442,14 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
-var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVariables) {
+var query = function query(qlkubeUrl, queryString, clusterUrl, token, queryVariables, selfManagedClient) {
   var connectionParams = {
     authorization: "Bearer ".concat(token),
     clusterUrl: clusterUrl,
     query: queryString,
     variables: queryVariables
   };
-  var client = createClient({
+  var client = selfManagedClient ? selfManagedClient : createClient({
     url: qlkubeUrl,
     connectionParams: connectionParams
   });
@@ -572,7 +572,7 @@ var useQuery = function useQuery() {
           error: 'invalid parameters'
         });
       });
-      return query("".concat(routerUrl || _routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables);
+      return query("".concat(routerUrl || _routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, selfManagedClient);
     }
   };
 };
