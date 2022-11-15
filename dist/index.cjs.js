@@ -3,8 +3,13 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var graphqlWs = require('graphql-ws');
+var axios = require('axios');
 var react = require('react');
 var jsxRuntime = require('react/jsx-runtime');
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
 
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
@@ -563,7 +568,7 @@ var httpQuery = /*#__PURE__*/function () {
               }
             };
             _context2.next = 3;
-            return axios.get(qlkubeUrl, _objectSpread2({}, config));
+            return axios__default["default"].get(qlkubeUrl, _objectSpread2({}, config));
 
           case 3:
             result = _context2.sent;

@@ -1,4 +1,5 @@
 import { createClient } from 'graphql-ws';
+import axios from 'axios';
 import { useState, createContext, useContext } from 'react';
 import { jsx } from 'react/jsx-runtime';
 

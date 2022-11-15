@@ -1,4 +1,5 @@
 import { createClient } from 'graphql-ws';
+import axios from 'axios';
 
 export const query = (
   qlkubeUrl,
