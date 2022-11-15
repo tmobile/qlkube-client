@@ -69,7 +69,6 @@ const useQuery = () => {
 
 const useHttpQuery = () => {
   const QLKUBE_PROVIDER = useContext(QlkubeContext);
-  const { routerUrl } = QLKUBE_PROVIDER;
   return {
     query: (
       clusterName,
@@ -78,6 +77,8 @@ const useHttpQuery = () => {
       queryVariables,
       _routerUrl
     ) => {
+      const routerUrl = QLKUBE_PROVIDER?.routerUrl;
+
       if((!routerUrl||routerUrl===null)&&!_routerUrl) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
       return httpQuery(
         `${routerUrl||_routerUrl}/${clusterName}/gqlreq`,

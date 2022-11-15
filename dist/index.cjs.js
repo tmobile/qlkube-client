@@ -659,9 +659,9 @@ var useQuery = function useQuery() {
 
 var useHttpQuery = function useHttpQuery() {
   var QLKUBE_PROVIDER = react.useContext(QlkubeContext);
-  var routerUrl = QLKUBE_PROVIDER.routerUrl;
   return {
     query: function query(clusterName, queryString, token, queryVariables, _routerUrl) {
+      var routerUrl = QLKUBE_PROVIDER === null || QLKUBE_PROVIDER === void 0 ? void 0 : QLKUBE_PROVIDER.routerUrl;
       if ((!routerUrl || routerUrl === null) && !_routerUrl) return new Promise(function (res, rej) {
         return rej({
           error: 'invalid parameters'
