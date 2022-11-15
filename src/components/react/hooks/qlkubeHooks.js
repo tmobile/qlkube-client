@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { subscribe ,query } from '../../core/qlkubeRequests';
+import { subscribe, query, httpQuery } from '../../core/qlkubeRequests';
 import { QlkubeContext } from '../context/QlkubeProvider';
 
 const useSub = () => {
@@ -67,7 +67,30 @@ const useQuery = () => {
   }
 }
 
+const useHttpQuery = () => {
+  const QLKUBE_PROVIDER = useContext(QlkubeContext);
+  const { routerUrl } = QLKUBE_PROVIDER;
+  return {
+    query: (
+      clusterName,
+      queryString, 
+      token,
+      queryVariables,
+      _routerUrl
+    ) => {
+      if((!routerUrl||routerUrl===null)&&!_routerUrl) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
+      return httpQuery(
+        `${routerUrl||_routerUrl}/${clusterName}/gqlreq`,
+        queryString, 
+        token,
+        queryVariables
+      )
+    }
+  }
+}
+
 export {
   useQuery,
-  useSub
+  useSub,
+  useHttpQuery
 };

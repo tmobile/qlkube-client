@@ -61,3 +61,24 @@ export const subscribe = async (
   );
   return client;
 };
+
+export const httpQuery = async (
+  qlkubeUrl,
+  queryString,
+  token,
+  queryVariables,
+) => {
+
+  const config = {
+    headers: {
+      connectionParams: JSON.stringify({
+        authorization: `Bearer ${token}`,
+        query: queryString,
+        queryVariables
+      })
+    }
+  };
+
+  const result = await axios.get(qlkubeUrl, { ...config });
+  return result.data;
+};

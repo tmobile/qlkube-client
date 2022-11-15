@@ -2,6 +2,32 @@ import { createClient } from 'graphql-ws';
 import { useState, createContext, useContext } from 'react';
 import { jsx } from 'react/jsx-runtime';
 
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    enumerableOnly && (symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    })), keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = null != arguments[i] ? arguments[i] : {};
+    i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+      _defineProperty(target, key, source[key]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+    });
+  }
+
+  return target;
+}
+
 function _regeneratorRuntime() {
   /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
 
@@ -383,6 +409,21 @@ function _asyncToGenerator(fn) {
   };
 }
 
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
 function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
@@ -501,6 +542,41 @@ var subscribe = /*#__PURE__*/function () {
     return _ref.apply(this, arguments);
   };
 }();
+var httpQuery = /*#__PURE__*/function () {
+  var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(qlkubeUrl, queryString, token, queryVariables) {
+    var config, result;
+    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            config = {
+              headers: {
+                connectionParams: JSON.stringify({
+                  authorization: "Bearer ".concat(token),
+                  query: queryString,
+                  queryVariables: queryVariables
+                })
+              }
+            };
+            _context2.next = 3;
+            return axios.get(qlkubeUrl, _objectSpread2({}, config));
+
+          case 3:
+            result = _context2.sent;
+            return _context2.abrupt("return", result.data);
+
+          case 5:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2);
+  }));
+
+  return function httpQuery(_x10, _x11, _x12, _x13) {
+    return _ref2.apply(this, arguments);
+  };
+}();
 
 var QlkubeContext = /*#__PURE__*/createContext();
 
@@ -577,4 +653,19 @@ var useQuery = function useQuery() {
   };
 };
 
-export { QLKubeProvider, query, subscribe, useQuery, useSub };
+var useHttpQuery = function useHttpQuery() {
+  var QLKUBE_PROVIDER = useContext(QlkubeContext);
+  var routerUrl = QLKUBE_PROVIDER.routerUrl;
+  return {
+    query: function query(clusterName, queryString, token, queryVariables, _routerUrl) {
+      if ((!routerUrl || routerUrl === null) && !_routerUrl) return new Promise(function (res, rej) {
+        return rej({
+          error: 'invalid parameters'
+        });
+      });
+      return httpQuery("".concat(routerUrl || _routerUrl, "/").concat(clusterName, "/gqlreq"), queryString, token, queryVariables);
+    }
+  };
+};
+
+export { QLKubeProvider, httpQuery, query, subscribe, useHttpQuery, useQuery, useSub };
