@@ -4,7 +4,7 @@ import { QlkubeContext } from '../context/QlkubeProvider';
 
 const useSub = () => {
   const QLKUBE_PROVIDER = useContext(QlkubeContext);
-  const { routerUrl } = QLKUBE_PROVIDER;
+  const { hostName } = QLKUBE_PROVIDER;
 
   const [data, setData]= useState(null);
   const [error, setError]= useState(null);
@@ -25,7 +25,7 @@ const useSub = () => {
       completeCallback,
       selfManagedClient
     ) => subscribe(
-      `${routerUrl}/${clusterName}/gql`,
+      `wss://${hostName}/${clusterName}/gql`,
       queryString,
       clusterUrl,
       token,
@@ -43,7 +43,7 @@ const useSub = () => {
 
 const useQuery = () => {
   const QLKUBE_PROVIDER = useContext(QlkubeContext);
-  const { routerUrl } = QLKUBE_PROVIDER;
+  const { hostName } = QLKUBE_PROVIDER;
   return {
     query: (
       clusterName,
@@ -54,9 +54,9 @@ const useQuery = () => {
       selfManagedClient,
       _routerUrl
     ) => {
-      if((!routerUrl||routerUrl===null)&&!_routerUrl) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
+      if((!hostName||hostName===null)&&!_routerUrl) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
       return query(
-        `${routerUrl||_routerUrl}/${clusterName}/gql`,
+        _routerUrl ? _routerUrl : `wss://${hostName}/${clusterName}/gql`,
         queryString, 
         clusterUrl, 
         token,
@@ -77,11 +77,11 @@ const useHttpQuery = () => {
       queryVariables,
       _routerUrl
     ) => {
-      const routerUrl = QLKUBE_PROVIDER?.routerUrl;
+      const hostName = QLKUBE_PROVIDER?.hostName;
 
-      if((!routerUrl||routerUrl===null)&&!_routerUrl) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
+      if((!hostName||hostName===null)&&!_routerUrl) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
       return httpQuery(
-        _routerUrl ? _routerUrl : `${routerUrl||_routerUrl}/${clusterName}/gqlreq`,
+        _routerUrl ? _routerUrl : `https://${hostName}/${clusterName}/gqlreq`,
         queryString, 
         token,
         queryVariables

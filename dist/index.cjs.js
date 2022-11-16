@@ -591,16 +591,15 @@ var QlkubeContext = /*#__PURE__*/react.createContext();
 
 var QLKubeProvider = function QLKubeProvider(_ref) {
   var children = _ref.children,
-      qlkubeRouterUrl = _ref.qlkubeRouterUrl;
+      qlkubeRouterHostName = _ref.qlkubeRouterHostName;
 
-  var _useState = react.useState(qlkubeRouterUrl),
-      _useState2 = _slicedToArray(_useState, 2),
-      routerUrl = _useState2[0];
-      _useState2[1];
+  var _useState = react.useState(qlkubeRouterHostName),
+      _useState2 = _slicedToArray(_useState, 1),
+      hostName = _useState2[0];
 
   return /*#__PURE__*/jsxRuntime.jsx(QlkubeContext.Provider, {
     value: {
-      routerUrl: routerUrl
+      hostName: hostName
     },
     children: children
   });
@@ -608,7 +607,7 @@ var QLKubeProvider = function QLKubeProvider(_ref) {
 
 var useSub = function useSub() {
   var QLKUBE_PROVIDER = react.useContext(QlkubeContext);
-  var routerUrl = QLKUBE_PROVIDER.routerUrl;
+  var hostName = QLKUBE_PROVIDER.hostName;
 
   var _useState = react.useState(null),
       _useState2 = _slicedToArray(_useState, 2),
@@ -639,7 +638,7 @@ var useSub = function useSub() {
 
   return {
     subscribe: function subscribe$1(clusterName, queryString, clusterUrl, token, queryVariables, dataCallback, errorCallback, completeCallback, selfManagedClient) {
-      return subscribe("".concat(routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, dataCallback || onData, errorCallback || onError, completeCallback || onComplete, selfManagedClient);
+      return subscribe("wss://".concat(hostName, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, dataCallback || onData, errorCallback || onError, completeCallback || onComplete, selfManagedClient);
     },
     eventData: data,
     error: error,
@@ -649,15 +648,15 @@ var useSub = function useSub() {
 
 var useQuery = function useQuery() {
   var QLKUBE_PROVIDER = react.useContext(QlkubeContext);
-  var routerUrl = QLKUBE_PROVIDER.routerUrl;
+  var hostName = QLKUBE_PROVIDER.hostName;
   return {
     query: function query$1(clusterName, queryString, clusterUrl, token, queryVariables, selfManagedClient, _routerUrl) {
-      if ((!routerUrl || routerUrl === null) && !_routerUrl) return new Promise(function (res, rej) {
+      if ((!hostName || hostName === null) && !_routerUrl) return new Promise(function (res, rej) {
         return rej({
           error: 'invalid parameters'
         });
       });
-      return query("".concat(routerUrl || _routerUrl, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, selfManagedClient);
+      return query(_routerUrl ? _routerUrl : "wss://".concat(hostName, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, selfManagedClient);
     }
   };
 };
@@ -666,13 +665,13 @@ var useHttpQuery = function useHttpQuery() {
   var QLKUBE_PROVIDER = react.useContext(QlkubeContext);
   return {
     query: function query(clusterName, queryString, token, queryVariables, _routerUrl) {
-      var routerUrl = QLKUBE_PROVIDER === null || QLKUBE_PROVIDER === void 0 ? void 0 : QLKUBE_PROVIDER.routerUrl;
-      if ((!routerUrl || routerUrl === null) && !_routerUrl) return new Promise(function (res, rej) {
+      var hostName = QLKUBE_PROVIDER === null || QLKUBE_PROVIDER === void 0 ? void 0 : QLKUBE_PROVIDER.hostName;
+      if ((!hostName || hostName === null) && !_routerUrl) return new Promise(function (res, rej) {
         return rej({
           error: 'invalid parameters'
         });
       });
-      return httpQuery(_routerUrl ? _routerUrl : "".concat(routerUrl || _routerUrl, "/").concat(clusterName, "/gqlreq"), queryString, token, queryVariables);
+      return httpQuery(_routerUrl ? _routerUrl : "https://".concat(hostName, "/").concat(clusterName, "/gqlreq"), queryString, token, queryVariables);
     }
   };
 };
