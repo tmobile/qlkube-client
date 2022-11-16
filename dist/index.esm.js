@@ -555,7 +555,7 @@ var httpQuery = /*#__PURE__*/function () {
                 connectionParams: JSON.stringify({
                   authorization: "Bearer ".concat(token),
                   query: queryString,
-                  queryVariables: queryVariables
+                  variables: queryVariables
                 })
               }
             };

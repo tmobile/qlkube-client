@@ -75,7 +75,7 @@ export const httpQuery = async (
       connectionParams: JSON.stringify({
         authorization: `Bearer ${token}`,
         query: queryString,
-        queryVariables
+        variables: queryVariables
       })
     }
   };
