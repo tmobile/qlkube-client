@@ -656,7 +656,9 @@ var useQuery = function useQuery() {
           error: 'invalid parameters'
         });
       });
-      return query(_routerUrl ? _routerUrl : "wss://".concat(hostName, "/").concat(clusterName, "/gql"), queryString, clusterUrl, token, queryVariables, selfManagedClient);
+      var targetUrl = _routerUrl ? _routerUrl : "wss://".concat(hostName, "/").concat(clusterName, "/gql");
+      console.log('targetUrl query', targetUrl);
+      return query(targetUrl, queryString, clusterUrl, token, queryVariables, selfManagedClient);
     }
   };
 };
@@ -666,12 +668,14 @@ var useHttpQuery = function useHttpQuery() {
   return {
     query: function query(clusterName, queryString, token, queryVariables, _routerUrl) {
       var hostName = QLKUBE_PROVIDER === null || QLKUBE_PROVIDER === void 0 ? void 0 : QLKUBE_PROVIDER.hostName;
+      var targetUrl = _routerUrl ? _routerUrl : "https://".concat(hostName, "/").concat(clusterName, "/gqlreq");
+      console.log('targetUrl http', targetUrl);
       if ((!hostName || hostName === null) && !_routerUrl) return new Promise(function (res, rej) {
         return rej({
           error: 'invalid parameters'
         });
       });
-      return httpQuery(_routerUrl ? _routerUrl : "https://".concat(hostName, "/").concat(clusterName, "/gqlreq"), queryString, token, queryVariables);
+      return httpQuery(targetUrl, queryString, token, queryVariables);
     }
   };
 };
