@@ -672,7 +672,7 @@ var useHttpQuery = function useHttpQuery() {
           error: 'invalid parameters'
         });
       });
-      return httpQuery("".concat(routerUrl || _routerUrl, "/").concat(clusterName, "/gqlreq"), queryString, token, queryVariables);
+      return httpQuery(_routerUrl ? _routerUrl : "".concat(routerUrl || _routerUrl, "/").concat(clusterName, "/gqlreq"), queryString, token, queryVariables);
     }
   };
 };

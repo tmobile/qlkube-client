@@ -81,7 +81,7 @@ const useHttpQuery = () => {
 
       if((!routerUrl||routerUrl===null)&&!_routerUrl) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
       return httpQuery(
-        `${routerUrl||_routerUrl}/${clusterName}/gqlreq`,
+        _routerUrl ? _routerUrl : `${routerUrl||_routerUrl}/${clusterName}/gqlreq`,
         queryString, 
         token,
         queryVariables
