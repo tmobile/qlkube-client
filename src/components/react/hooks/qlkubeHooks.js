@@ -56,7 +56,6 @@ const useQuery = () => {
     ) => {
       if((!hostName||hostName===null)&&!_routerUrl) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
       const targetUrl = _routerUrl ? _routerUrl : `wss://${hostName}/${clusterName}/gql`;
-      console.log('targetUrl query', targetUrl)
       return query(
         targetUrl,
         queryString, 
@@ -81,7 +80,6 @@ const useHttpQuery = () => {
     ) => {
       const hostName = QLKUBE_PROVIDER?.hostName;
       const targetUrl = _routerUrl ? _routerUrl : `https://${hostName}/${clusterName}/gqlreq`;
-      console.log('targetUrl http', targetUrl)
       if((!hostName||hostName===null)&&!_routerUrl) return new Promise((res, rej) => rej({error: 'invalid parameters'}));
       return httpQuery(
         targetUrl,
