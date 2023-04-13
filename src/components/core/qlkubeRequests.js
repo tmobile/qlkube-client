@@ -69,17 +69,23 @@ export const httpQuery = async (
   token,
   queryVariables,
 ) => {
+  try {
 
-  const config = {
-    headers: {
-      connectionParams: JSON.stringify({
+    const body = {
+      query: queryString,
+      variables: queryVariables
+    };
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
         authorization: `Bearer ${token}`,
-        query: queryString,
-        variables: queryVariables
-      })
-    }
-  };
+      }
+    };
 
-  const result = await axios.get(qlkubeUrl, { ...config });
-  return result.data;
+    const result = await axios.post(qlkubeUrl, { ...body }, { ...config});
+  
+    return result.data;
+  } catch (error) {
+    console.log('err', error)
+  }
 };
